@@ -1,5 +1,14 @@
-*.class
+.metadata/
+RemoteSystemsTempFiles
 
+PDFExtractPrototype/bin/
+PDFExtractPrototype/.settings/
+PDFExtractPrototype/.classpath
+PDFExtractPrototype/.project
+
+
+
+*.class
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
