@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.xml.sax.SAXException;
 
@@ -52,6 +53,12 @@ public class Main {
 					continue;
 				}
 				
+				Tika tika = new Tika();
+				String mediaType = tika.detect(y);
+				if(!mediaType.contains("pdf")){
+					System.out.println("File is not a PDF: " + x);
+					continue;
+				}
 				inputFiles.put(x, y);
 			}
 			

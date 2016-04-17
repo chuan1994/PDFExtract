@@ -13,13 +13,13 @@ import org.xml.sax.SAXException;
 
 
 public class MyPDFParser {
-	String path;
-	File pdf;
+	private String path;
+	private File pdf;
 	
-	BodyContentHandler handler = new BodyContentHandler();
-	Metadata metadata = new Metadata();
-	ParseContext context = new ParseContext();
-	PDFParser parser = new PDFParser();
+	private BodyContentHandler handler = new BodyContentHandler();
+	private Metadata metadata = new Metadata();
+	private ParseContext context = new ParseContext();
+	private PDFParser parser = new PDFParser();
 	
 	
 	public MyPDFParser(String path, File pdf, File outputFolder){
@@ -29,6 +29,7 @@ public class MyPDFParser {
 	}
 	
 	public void parse() throws IOException, SAXException, TikaException{
+		
 		FileInputStream fis = new FileInputStream(pdf);
 		parser.parse(fis, handler, metadata, context);
 		
