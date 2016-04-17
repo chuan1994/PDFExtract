@@ -23,12 +23,8 @@ public class Main {
 			Set<String> keys = inputFiles.keySet();
 			for(String x : keys){
 				MyPDFParser z = new MyPDFParser(x, inputFiles.get(x), outputFolder);
-				try {
-					z.parse();
-				} catch (IOException | SAXException | TikaException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				z.parse();
+				z.writeToTxt();
 			}
 		}
 	}
