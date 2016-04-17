@@ -6,25 +6,40 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Set;
+
+import org.apache.tika.exception.TikaException;
+import org.xml.sax.SAXException;
 
 public class Main {
 	private static HashMap<String,File> inputFiles = new HashMap<String, File>();
 	private static File outputFolder;
 	
 	public static void main(String[] args) {
-		// Reading in properties
 		getProperties();
+		//Parsing input pdfs
 		if(isPopulated()){
-			
+			Set<String> keys = inputFiles.keySet();
+			for(String x : keys){
+				MyPDFParser z = new MyPDFParser(x, inputFiles.get(x), outputFolder);
+				try {
+					z.parse();
+				} catch (IOException | SAXException | TikaException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 
+	//========================================================================================================================
+	//Helper methods for loading files;
 	public static void getProperties() {
 
 		Properties configProp = new Properties();
 
-
 		try {
+			//Loading input files
 			FileInputStream configInputStream = new FileInputStream(".\\resources\\config.properties");
 			configProp.load(configInputStream);
 			String inputFilePaths = configProp.getProperty("input");
@@ -38,6 +53,16 @@ public class Main {
 				}
 				
 				inputFiles.put(x, y);
+			}
+			
+			//Loading output directory
+			File temp = new File(configProp.getProperty("output"));
+			if(temp.isFile()){
+				return;
+			}
+			outputFolder = temp;
+			if (!outputFolder.exists()){
+				outputFolder.mkdir();
 			}
 			
 		} catch (FileNotFoundException e) {
