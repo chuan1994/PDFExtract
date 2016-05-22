@@ -31,7 +31,6 @@ public class PageDimensionCalc {
 	}
 	
 	private void addSize(float height, float width){
-		System.out.println(height + " , " + width);
 		if(floatComparator(height, 1684 , 1)&& floatComparator(width, 2384 ,1)){
 			A0++;
 		}else if(floatComparator(height, 1684 , 1)&& floatComparator(width, 2384 ,1)){
@@ -62,7 +61,7 @@ public class PageDimensionCalc {
 	private String getBiggest(){
 		int largest = Collections.max(Arrays.asList(A0,A1,A2,A3,A4,A5,A6,other));
 		
-		if(largest == A0){
+		if(largest == A0){S
 			return "A0";
 		}else if(largest == A1){
 			return "A1";
