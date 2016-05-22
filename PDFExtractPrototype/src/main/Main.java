@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
 
-import org.xml.sax.SAXException;
-
 import helperClasses.PDFValidator;
 
 public class Main {
@@ -24,11 +22,10 @@ public class Main {
 			Set<String> keys = inputFiles.keySet();
 			for(String x : keys){
 				MyPDFParser parser = new MyPDFParser(x, inputFiles.get(x), outputFolder);
-				
+				parser.parseAll();
 			}
 		}
 	}
-
 	//========================================================================================================================
 	//Helper methods for loading files;
 	public static void getProperties() {

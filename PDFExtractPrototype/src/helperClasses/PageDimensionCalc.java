@@ -31,6 +31,7 @@ public class PageDimensionCalc {
 	}
 	
 	private void addSize(float height, float width){
+		System.out.println(height + " , " + width);
 		if(floatComparator(height, 1684 , 1)&& floatComparator(width, 2384 ,1)){
 			A0++;
 		}else if(floatComparator(height, 1684 , 1)&& floatComparator(width, 2384 ,1)){

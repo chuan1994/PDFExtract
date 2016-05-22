@@ -2,7 +2,10 @@ package helperClasses;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
 
 /**
  * Primitive check to see if file is a valid pdf
@@ -27,20 +30,13 @@ public class PDFValidator {
 	 */
 	public boolean isPDF(){
 		try {
-			Scanner input = new Scanner(file);
-			while (input.hasNextLine()){
-				String line = input.nextLine();
-				if(line.contains("%PDF-")){
-					return true;
-				}
-			}
-				input.close();
-			
-		} catch (FileNotFoundException e) {
+			PDDocument pdDoc = new PDDocument();
+			pdDoc = pdDoc.load(file);
+			return true;
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return false;
 		}
-		
-		return false;
 	}
 }

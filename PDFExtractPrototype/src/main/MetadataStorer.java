@@ -151,5 +151,8 @@ public class MetadataStorer {
 		
 		System.out.print("Number of Pages: "); 
 		System.out.println(this.pageLength);
+		
+		System.out.print("Page Size: "); 
+		System.out.println(this.pageSize);
 	}
 }
