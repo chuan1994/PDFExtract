@@ -6,6 +6,11 @@ PDFExtractPrototype/.settings/
 PDFExtractPrototype/.classpath
 PDFExtractPrototype/.project
 
+TikaExtractPrototype/bin/
+TikaExtractPrototype/.settings/
+TikaExtractPrototype/.classpath
+TikaExtractPrototype/.project
+
 
 
 *.class
