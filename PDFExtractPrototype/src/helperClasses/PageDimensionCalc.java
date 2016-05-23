@@ -61,7 +61,7 @@ public class PageDimensionCalc {
 	private String getBiggest(){
 		int largest = Collections.max(Arrays.asList(A0,A1,A2,A3,A4,A5,A6,other));
 		
-		if(largest == A0){S
+		if(largest == A0){
 			return "A0";
 		}else if(largest == A1){
 			return "A1";
