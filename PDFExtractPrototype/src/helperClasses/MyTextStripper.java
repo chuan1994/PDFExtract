@@ -33,7 +33,7 @@ public class MyTextStripper extends PDFTextStripper {
 				
 				if(prevBaseFontSize > 0){
 					System.out.println(localBuilder.toString());
-					FontGroupBlock f = new FontGroupBlock(baseFont, baseFontSize, localBuilder.toString());
+					FontGroupBlock f = new FontGroupBlock(baseFont, baseFontSize, localBuilder.toString(), 0);
 					fontGrouping.add(f);
 				}
 				
