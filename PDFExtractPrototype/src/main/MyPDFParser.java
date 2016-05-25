@@ -2,12 +2,9 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.text.PDFTextStripper;
-import org.apache.pdfbox.text.TextPosition;
 
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
@@ -19,7 +16,7 @@ public class MyPDFParser {
 	private PDDocument pdDoc;
 	private MetadataStorer meta= new MetadataStorer();
 	private PageDimensionCalc pdCalc = new PageDimensionCalc();
-	private PDFTextStripper stripper;
+	private MyTextStripper stripper;
 	
 	public MyPDFParser(String path, File pdf, File outputFolder){
 		this.path = path;
@@ -41,6 +38,8 @@ public class MyPDFParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		stripper.print();
 	}
 
 	public MetadataStorer getMetaData(){
