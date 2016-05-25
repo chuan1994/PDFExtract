@@ -23,6 +23,7 @@ public class Main {
 			for(String x : keys){
 				MyPDFParser parser = new MyPDFParser(x, inputFiles.get(x), outputFolder);
 				parser.parseAll();
+				parser.close();
 			}
 		}
 	}
