@@ -52,7 +52,7 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 		else{
 			//Add previous block into a group
-			FontGroupBlock f = new FontGroupBlock(prevBaseFont, prevBaseFontSize, localString.toString());
+			FontGroupBlock f = new FontGroupBlock(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
 			fontGrouping.add(f);
 			
 			//Resetting for 
