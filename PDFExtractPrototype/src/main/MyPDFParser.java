@@ -16,7 +16,8 @@ public class MyPDFParser {
 	private PDDocument pdDoc;
 	private MetadataStorer meta= new MetadataStorer();
 	private PageDimensionCalc pdCalc = new PageDimensionCalc();
-	private MyTextStripper stripper;
+	private MyTextStripper myStripper;
+	private PDFTextStripper stripper;
 	
 	public MyPDFParser(String path, File pdf, File outputFolder){
 		this.path = path;
@@ -30,16 +31,18 @@ public class MyPDFParser {
 	 */
 	public void parseAll(){
 		addSurfaceMeta();
-		meta.print();
+		//meta.print();
 		try {
-			String text = stripper.getText(pdDoc);
+			String text = myStripper.getText(pdDoc);
 			//System.out.println(text);
+			//myStripper.print();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		stripper.print();
+		addComplexMeta();
+	
 	}
 
 	public MetadataStorer getMetaData(){
@@ -60,7 +63,8 @@ public class MyPDFParser {
 		try {
 			pdDoc = pdDoc.load(pdf);
 			
-			stripper = new MyTextStripper();
+			myStripper = new MyTextStripper();
+			stripper = new PDFTextStripper();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -73,5 +77,7 @@ public class MyPDFParser {
 		meta.setPageSize(pdCalc.getPageSize(pdDoc.getPages()));
 	}
 	
-	
+	private void addComplexMeta(){
+		//UOAReportChecker checker = new UOAReportChecker(stripper.getFontGroups());
+	}
 }
