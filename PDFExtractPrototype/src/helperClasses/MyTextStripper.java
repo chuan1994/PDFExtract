@@ -14,7 +14,6 @@ public class MyTextStripper extends PDFTextStripper {
 	private String prevBaseFont = "";
 	private float prevBaseFontSize = 0;
 	private StringBuilder localString = new StringBuilder();
-
 	private ArrayList<FontGroupBlock> fontGrouping = new ArrayList<FontGroupBlock>();
 
 	public MyTextStripper() throws IOException {
@@ -65,7 +64,7 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 	}
 	
-	public ArrayList<FontGroupBlock> getFontGroups(){
+	public ArrayList<FontGroupBlock> getFontGroupsV1(){
 		return this.fontGrouping;
 	}
 	
@@ -78,6 +77,8 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 	}
 	
+	
+	//Helper methods to retrieve most common font and size in a text block
 	private String getCommonFont(ArrayList<String> fonts){
 		HashMap<String, Integer> countMap = new HashMap<String, Integer>();
 		for(String s : fonts){

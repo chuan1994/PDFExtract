@@ -22,5 +22,4 @@ public class FontGroupBlock {
 	public String getText(){
 		return this.text;
 	}
-	
 }

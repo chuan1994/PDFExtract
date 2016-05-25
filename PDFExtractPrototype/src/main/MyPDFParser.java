@@ -2,10 +2,12 @@ package main;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import helperClasses.FontGroupBlock;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
 
@@ -26,16 +28,29 @@ public class MyPDFParser {
 		setup();
 	}
 	
+	
 	/**
-	 * Method to extract whole file into text
+	 * Method to mine all metadata
 	 */
 	public void parseAll(){
 		addSurfaceMeta();
 		//meta.print();
 		try {
+			
+			for (int i = 1; i <= 5; i++){
+				myStripper.setStartPage(i);
+				myStripper.setEndPage(i);
+				String text = myStripper.getText(pdDoc);
+				System.out.println(text);
+				System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();
+			}
+			
 			String text = myStripper.getText(pdDoc);
-			//System.out.println(text);
-			//myStripper.print();
+			System.out.println(text);
+			
+			ArrayList<FontGroupBlock> groupV1 = myStripper.getFontGroupsV1();
+			
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -49,6 +64,7 @@ public class MyPDFParser {
 		return this.meta;
 	}
 	
+	
 	public void close(){
 		try {
 			pdDoc.close();
@@ -58,6 +74,9 @@ public class MyPDFParser {
 		}
 	}
 	
+	
+	//=============================================================================
+	//PRIVATE METHODS
 	private void setup(){
 		this.pdDoc = new PDDocument();
 		try {
