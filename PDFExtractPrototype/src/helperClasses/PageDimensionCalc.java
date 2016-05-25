@@ -31,19 +31,19 @@ public class PageDimensionCalc {
 	}
 	
 	private void addSize(float height, float width){
-		if(floatComparator(height, 1684 , 1)&& floatComparator(width, 2384 ,1)){
+		if((floatComparator(height, 3371f , 10)&& floatComparator(width, 2384f ,10))||(floatComparator(height, 2384f , 10)&& floatComparator(width, 3371f ,10))){
 			A0++;
-		}else if(floatComparator(height, 1684 , 1)&& floatComparator(width, 2384 ,1)){
+		}else if((floatComparator(height, 1684f , 10)&& floatComparator(width, 2384f ,10))||(floatComparator(height, 2384f , 10)&& floatComparator(width, 1684f ,10))){
 			A1++;
-		}else if(floatComparator(height, 1191 , 1)&& floatComparator(width, 1684 ,1)){
+		}else if((floatComparator(height, 1191f , 10)&& floatComparator(width, 1684f ,10))||(floatComparator(height, 1684f , 10)&& floatComparator(width, 1191f ,10))){
 			A2++;
-		}else if(floatComparator(height, 842 , 1)&& floatComparator(width, 1191 , 1)){
+		}else if((floatComparator(height, 842f , 10)&& floatComparator(width, 1191f , 10))||(floatComparator(height, 1191f , 10)&& floatComparator(width, 842f ,10))){
 			A3++;
-		}else if(floatComparator(height, 595 , 1)&& floatComparator(width, 842 , 1)){
+		}else if((floatComparator(height, 595f , 10)&& floatComparator(width, 842f , 10))||(floatComparator(height, 842f , 10)&& floatComparator(width, 595f ,10))){
 			A4++;
-		}else if(floatComparator(height, 420 , 1)&& floatComparator(width, 595 , 1)){
+		}else if((floatComparator(height, 420f , 10)&& floatComparator(width, 595f , 10))||(floatComparator(height, 595f , 10)&& floatComparator(width, 420f ,10))){
 			A5++;
-		}else if(floatComparator(height, 298 , 1)&& floatComparator(width, 420 ,1)){
+		}else if((floatComparator(height, 298f , 10)&& floatComparator(width, 420f ,10))||(floatComparator(height, 420f , 10)&& floatComparator(width, 298f ,10))){
 			A6++;
 		}else {
 			other++;
@@ -61,7 +61,7 @@ public class PageDimensionCalc {
 	private String getBiggest(){
 		int largest = Collections.max(Arrays.asList(A0,A1,A2,A3,A4,A5,A6,other));
 		
-		if(largest == A0){S
+		if(largest == A0){
 			return "A0";
 		}else if(largest == A1){
 			return "A1";

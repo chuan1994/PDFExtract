@@ -35,7 +35,7 @@ public class MyPDFParser {
 		meta.print();
 		try {
 			String text = stripper.getText(pdDoc);
-			System.out.println(text);
+			//System.out.println(text);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
