@@ -34,7 +34,7 @@ public class Main {
 
 		try {
 			//Loading input files
-			FileInputStream configInputStream = new FileInputStream(".\\resources\\config.properties");
+			FileInputStream configInputStream = new FileInputStream("./resources/config.properties");
 			configProp.load(configInputStream);
 			String inputFilePaths = configProp.getProperty("input");
 			String[] paths = inputFilePaths.split(";");
