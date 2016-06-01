@@ -2,7 +2,9 @@ package helperClasses;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
@@ -11,7 +13,7 @@ public class MyTextStripper extends PDFTextStripper {
 
 	private String prevBaseFont = "";
 	private float prevBaseFontSize = 0;
-
+	private StringBuilder localString = new StringBuilder();
 	private ArrayList<FontGroupBlock> fontGrouping = new ArrayList<FontGroupBlock>();
 
 	public MyTextStripper() throws IOException {
@@ -21,37 +23,48 @@ public class MyTextStripper extends PDFTextStripper {
 	@Override
 	public void writeString(String text, List<TextPosition> textPositions)
 			throws IOException {
-		//Creating builders
-		StringBuilder builder = new StringBuilder();
-		StringBuilder localBuilder = new StringBuilder();
 		
-		//Processing parsed text
-		for (TextPosition position : textPositions) {
-			String baseFont = position.getFont().getName();
-			float baseFontSize = position.getFontSize();
-			if (baseFont != null && (!baseFont.equals(prevBaseFont) || (Math.abs(baseFontSize - prevBaseFontSize)) > 1f)) {
-				
-				if(prevBaseFontSize > 0){
-					System.out.println(localBuilder.toString());
-					FontGroupBlock f = new FontGroupBlock(baseFont, baseFontSize, localBuilder.toString(), 0);
-					fontGrouping.add(f);
-				}
-				
-				localBuilder = new StringBuilder();
-				builder.append('[').append(baseFont).append(',')
-						.append(baseFontSize).append(']');
-				prevBaseFont = baseFont;
-				prevBaseFontSize = baseFontSize;
-			}
-			for (int i : position.getCharacterCodes()) {
-				localBuilder.append(Character.toString((char) i));
-				builder.append(Character.toString((char) i));
-			}
+		text = text.trim();
+		
+		if(text.matches("\\s+") || text.equals("")){
+			return;
 		}
-		writeString(builder.toString());
+		
+		ArrayList<String> fonts = new ArrayList<String>();
+		ArrayList<Float> fontSizes = new ArrayList<Float>();
+		
+		for(TextPosition t: textPositions){
+			fonts.add(t.getFont().getName());
+			fontSizes.add(t.getFontSize());
+		}
+		
+		String commonFont = this.getCommonFont(fonts);
+		float commonFontSize = this.getCommonFontSize(fontSizes);
+		
+		if(commonFont.matches("\\s+") || commonFont.equals("") || ((int)commonFontSize) == 0){
+			return;
+		}
+		
+		
+		if(commonFont.equals(prevBaseFont) && Math.abs(commonFontSize - prevBaseFontSize) < 0.1f){
+			localString.append(" " + text);
+			writeString(text);
+		}
+		else{
+			//Add previous block into a group
+			FontGroupBlock f = new FontGroupBlock(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
+			fontGrouping.add(f);
+			
+			//Resetting for 
+			prevBaseFont = commonFont;
+			prevBaseFontSize = commonFontSize;
+			writeString("[" + commonFont + "," + commonFontSize + "] " + text );
+			localString = new StringBuilder();
+			localString.append(text);
+		}
 	}
 	
-	public ArrayList<FontGroupBlock> getText(){
+	public ArrayList<FontGroupBlock> getFontGroupsV1(){
 		return this.fontGrouping;
 	}
 	
@@ -62,5 +75,51 @@ public class MyTextStripper extends PDFTextStripper {
 			System.out.println("Text = " + f.getText());
 			System.out.println();
 		}
+	}
+	
+	
+	//Helper methods to retrieve most common font and size in a text block
+	private String getCommonFont(ArrayList<String> fonts){
+		HashMap<String, Integer> countMap = new HashMap<String, Integer>();
+		for(String s : fonts){
+			if(countMap.containsKey(s)){
+				countMap.put(s, countMap.get(s) + 1);
+			}
+			else{
+				countMap.put(s, 0);
+			}
+		}
+		
+		Entry<String, Integer> max = null;
+		for(Entry<String, Integer> e: countMap.entrySet()){
+			if(max == null || max.getValue() < e.getValue()){
+				max = e;
+			}
+		}
+		
+		
+		return max.getKey();
+	}
+	
+	private float getCommonFontSize(ArrayList<Float> fontSizes){
+		HashMap<Float, Integer> countMap = new HashMap<Float, Integer>();
+		for(Float f : fontSizes){
+			if(countMap.containsKey(f)){
+				countMap.put(f, countMap.get(f) + 1);
+			}
+			else{
+				countMap.put(f, 0);
+			}
+		}
+		
+		Entry<Float, Integer> max = null;
+		for(Entry<Float, Integer> e: countMap.entrySet()){
+			if(max == null || max.getValue() < e.getValue()){
+				max = e;
+			}
+		}
+		
+		
+		return max.getKey();
 	}
 }
