@@ -8,6 +8,7 @@ public class UOAReportChecker implements ReportChecker {
 
 	ArrayList<FontGroupBlock> fontGroupings = new ArrayList<FontGroupBlock>();
 	FontGroupBlock titleFGB = new FontGroupBlock(null, 0, null, 0);
+	int titleIndex = 0;
 	
 	public UOAReportChecker(ArrayList<FontGroupBlock> fontGroupings){
 		this.fontGroupings = fontGroupings;
@@ -29,14 +30,13 @@ public class UOAReportChecker implements ReportChecker {
 	@Override
 	public String findAuthor() {
 		String author = "";
-		int titleIndex = 0;
 		boolean isName;
 		for (int i=0; i< this.fontGroupings.size(); i++){
 			if(this.fontGroupings.get(i) == this.titleFGB){
-				titleIndex = i;
+				this.titleIndex = i;
 			}		
 		}
-		for (int i=titleIndex + 1; i< this.fontGroupings.size(); i++){
+		for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
 			isName = true;
 			author = this.fontGroupings.get(i).getText();
 			String authorName[] = author.split(" ");
@@ -55,8 +55,22 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findAbstract() {
-		// TODO Auto-generated method stub
-		return null;
+		boolean isAbstract = false;
+		int abstIndex = 0;
+		String abst;
+		String abstContent = "";
+		while (!isAbstract){
+			for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
+				abst = this.fontGroupings.get(i).getText();
+				if (abst.toLowerCase().equals("abstract")){
+					abstIndex = i;
+					isAbstract = true;
+				}
+			}
+		}
+		abstContent = this.fontGroupings.get(abstIndex + 1).getText();
+		return abstContent;
+
 	}
 	
 	public float maxFontSize() {
