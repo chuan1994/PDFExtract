@@ -2,6 +2,7 @@ package reportCheckers;
 
 import java.util.ArrayList;
 
+import main.MetadataStorer;
 import helperClasses.FontGroupBlock;
 
 public class UOAReportChecker implements ReportChecker {
@@ -12,6 +13,14 @@ public class UOAReportChecker implements ReportChecker {
 	
 	public UOAReportChecker(ArrayList<FontGroupBlock> fontGroupings){
 		this.fontGroupings = fontGroupings;
+	}
+	
+	public MetadataStorer getAllMeta(MetadataStorer ms){
+		ms.setTitle(findTitle());
+		ms.setAuthors(findAuthor());
+		ms.setAbstractx(findAbstract());
+		
+		return ms;
 	}
 	
 	@Override

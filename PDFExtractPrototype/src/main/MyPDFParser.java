@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.text.PDFTextStripper;
 
+import reportCheckers.UOAReportChecker;
 import helperClasses.FontGroupBlock;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
@@ -36,20 +37,23 @@ public class MyPDFParser {
 		addSurfaceMeta();
 		//meta.print();
 		try {
+			StringBuilder sb = new StringBuilder();
 			
 			for (int i = 1; i <= 5; i++){
 				myStripper.setStartPage(i);
 				myStripper.setEndPage(i);
-				String text = myStripper.getText(pdDoc);
-				System.out.println(text);
-				System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();System.out.println();
+				sb.append(myStripper.getText(pdDoc));
 			}
 			
-			String text = myStripper.getText(pdDoc);
-			System.out.println(text);
+//			String text = myStripper.getText(pdDoc);
+//			System.out.println(text);
 			
-			ArrayList<FontGroupBlock> groupV1 = myStripper.getFontGroupsV1();
+			ArrayList<FontGroupBlock> textGroup = myStripper.getFontGroups();
 			
+			UOAReportChecker checker = new UOAReportChecker(textGroup);
+			meta = checker.getAllMeta(meta);
+			
+			meta.print();
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
