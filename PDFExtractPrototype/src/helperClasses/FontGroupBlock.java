@@ -28,4 +28,11 @@ public class FontGroupBlock {
 	public int getPageNum(){
 		return this.pageNum;
 	}
+	
+	public void print(){
+		System.out.println("font :" + font);
+		System.out.println("size :" + fontSize);
+		System.out.println("text :" + text);
+		System.out.println("page :" + pageNum);
+	}
 }

@@ -59,7 +59,7 @@ public class MyTextStripper extends PDFTextStripper {
 			//Resetting for 
 			prevBaseFont = commonFont;
 			prevBaseFontSize = commonFontSize;
-			writeString("[" + commonFont + "," + commonFontSize + "] " + text );
+			writeString("[" + commonFont + "," + commonFontSize + "," + this.getCurrentPageNo() +"] " + text );
 			localString = new StringBuilder();
 			localString.append(text);
 		}

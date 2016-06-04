@@ -18,6 +18,9 @@ public class UOAReportChecker implements ReportChecker {
 	
 	@Override
 	public MetadataStorer getAllMeta(MetadataStorer ms){
+		if(fontGroupings.size() == 0)
+			return ms;
+		
 		ms.setTitle(findTitle());
 		ms.setAuthors(findAuthor());
 		ms.setAbstractx(findAbstract());

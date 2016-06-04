@@ -3,6 +3,8 @@ package main;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -34,8 +36,7 @@ public class MyPDFParser {
 	 * Method to mine all metadata
 	 */
 	public void parseAll(){
-		addSurfaceMeta();
-		//meta.print();
+		
 		try {
 			StringBuilder sb = new StringBuilder();
 			
@@ -46,14 +47,25 @@ public class MyPDFParser {
 			}
 			
 			String text = sb.toString();
-			System.out.println(text);
 			
-			ArrayList<FontGroupBlock> textGroup = myStripper.getFontGroups();
+			ArrayList<FontGroupBlock> textGroups1 = myStripper.getFontGroups();
+			ArrayList<FontGroupBlock> textGroups2 = splitOutcome(text);
 			
-			UOAReportChecker checker = new UOAReportChecker(textGroup);
+			System.out.println("===========================================================");
+			UOAReportChecker checker = new UOAReportChecker(textGroups1);
+			meta = new MetadataStorer();
+			addSurfaceMeta();
 			meta = checker.getAllMeta(meta);
-			
+			System.out.println("Output 1");
 			meta.print();
+			System.out.println("===========================================================");
+			UOAReportChecker checker2 = new UOAReportChecker(textGroups2);
+			meta = new MetadataStorer();
+			addSurfaceMeta();
+			meta = checker2.getAllMeta(meta);
+			System.out.println("Output 2");
+			meta.print();
+			System.out.println("===========================================================");
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -102,5 +114,23 @@ public class MyPDFParser {
 	
 	private void addComplexMeta(){
 		//UOAReportChecker checker = new UOAReportChecker(stripper.getFontGroups());
+	}
+	
+	private ArrayList<FontGroupBlock> splitOutcome(String text){
+		ArrayList<FontGroupBlock> fgb = new ArrayList<FontGroupBlock>();
+		Pattern pattern = Pattern.compile("(\\[.*,.*\\] )(((.+|\\s+)(?!(\\[.*,.*\\] )))*)");
+		
+		Matcher matcher = pattern.matcher(text);
+		while(matcher.find()){
+			String font = matcher.group(1).split(",")[0].replaceAll("(\\[|\\s+)", "");
+			float size = Float.parseFloat(matcher.group(1).split(",")[1].replaceAll("\\s+", ""));
+			int pageNum = Integer.parseInt(matcher.group(1).split(",")[2].replaceAll("(\\]|\\s+)", ""));
+			String texts = matcher.group(2);
+			
+			FontGroupBlock fg = new FontGroupBlock(font, size, texts, pageNum);
+			fgb.add(fg);
+		}
+		
+		return fgb;
 	}
 }
