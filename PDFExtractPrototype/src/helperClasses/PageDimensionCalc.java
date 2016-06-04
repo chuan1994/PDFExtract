@@ -22,6 +22,7 @@ public class PageDimensionCalc {
 	int A6 = 0;
 	int A0 = 0;
 	int other = 0;
+	
 	public String getPageSize(PDPageTree pages) {
 		for (PDPage p : pages){
 			addSize(p.getMediaBox().getHeight(), p.getMediaBox().getWidth());
