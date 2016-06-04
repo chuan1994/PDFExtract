@@ -4,7 +4,7 @@ import java.util.Date;
 public class MetadataStorer {
 	private String title;
 	private String altTitle;
-	private String authors;
+	private String[] authors;
 	private String supervisors;
 	private String degree;
 	private String degreeDiscp;
@@ -35,10 +35,10 @@ public class MetadataStorer {
 	}
 	
 	//=================================================	
-	public String getAuthors() {
+	public String[] getAuthors() {
 		return authors;
 	}
-	public void setAuthors(String authors) {
+	public void setAuthors(String[] authors) {
 		this.authors = authors;
 	}
 	
@@ -126,7 +126,10 @@ public class MetadataStorer {
 		System.out.println(this.altTitle);
 		
 		System.out.print("Authors: "); 
-		System.out.println(this.authors);
+		for(int i = 0; i < authors.length-1; i++){
+			System.out.print(this.authors[i] + ", ");
+		}
+		System.out.println(this.authors[authors.length-1]);
 		
 		System.out.print("Supervisors: "); 
 		System.out.println(this.supervisors);

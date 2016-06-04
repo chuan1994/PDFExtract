@@ -42,11 +42,11 @@ public class MyPDFParser {
 			for (int i = 1; i <= 5; i++){
 				myStripper.setStartPage(i);
 				myStripper.setEndPage(i);
-				sb.append(myStripper.getText(pdDoc));
+				sb.append("\n" + myStripper.getText(pdDoc));
 			}
 			
-//			String text = myStripper.getText(pdDoc);
-//			System.out.println(text);
+			String text = sb.toString();
+			System.out.println(text);
 			
 			ArrayList<FontGroupBlock> textGroup = myStripper.getFontGroups();
 			

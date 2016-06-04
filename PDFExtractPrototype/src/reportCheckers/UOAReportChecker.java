@@ -1,6 +1,7 @@
 package reportCheckers;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import main.MetadataStorer;
 import helperClasses.FontGroupBlock;
@@ -15,11 +16,13 @@ public class UOAReportChecker implements ReportChecker {
 		this.fontGroupings = fontGroupings;
 	}
 	
+	@Override
 	public MetadataStorer getAllMeta(MetadataStorer ms){
 		ms.setTitle(findTitle());
 		ms.setAuthors(findAuthor());
 		ms.setAbstractx(findAbstract());
-		
+		ms.setDegree(findDegree());
+		ms.setDegreeDiscp(findDiscipline());
 		return ms;
 	}
 	
@@ -37,8 +40,8 @@ public class UOAReportChecker implements ReportChecker {
 	}
 
 	@Override
-	public String findAuthor() {
-		String author = "";
+	public String[] findAuthor() {
+		String[] author = {""};
 		boolean isName;
 		for (int i=0; i< this.fontGroupings.size(); i++){
 			if(this.fontGroupings.get(i) == this.titleFGB){
@@ -47,8 +50,8 @@ public class UOAReportChecker implements ReportChecker {
 		}
 		for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
 			isName = true;
-			author = this.fontGroupings.get(i).getText();
-			String authorName[] = author.split(" ");
+			author[0] = this.fontGroupings.get(i).getText();
+			String authorName[] = author[0].split(" ");
 				
 			for(String name : authorName){
 				if (!Character.isUpperCase(name.charAt(0))){
@@ -59,7 +62,7 @@ public class UOAReportChecker implements ReportChecker {
 				return author;
 			}
 		}
-		return null;
+		return author;
 	}
 
 	@Override
@@ -82,6 +85,18 @@ public class UOAReportChecker implements ReportChecker {
 
 	}
 	
+	@Override
+	public String findDegree() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String findDiscipline() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public float maxFontSize() {
 		float maxFontSize = 0;
 		
@@ -92,4 +107,33 @@ public class UOAReportChecker implements ReportChecker {
 		}		
 		return maxFontSize;
 	}
+	
+	//=========================================================================
+	//Unimplemented
+
+	@Override
+	public String findSubtitle() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Date findPubDate() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String findPublisher() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String findUUID() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
 }
