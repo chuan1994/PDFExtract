@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-import reportCheckers.UOAReportChecker;
+import reportCheckers.UOA.UOAReportChecker;
 import helperClasses.FontGroupBlock;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;

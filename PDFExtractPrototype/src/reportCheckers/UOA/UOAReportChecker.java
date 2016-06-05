@@ -1,8 +1,11 @@
-package reportCheckers;
+package reportCheckers.UOA;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import reportCheckers.ReportChecker;
 import main.MetadataStorer;
 import helperClasses.FontGroupBlock;
 
@@ -91,23 +94,36 @@ public class UOAReportChecker implements ReportChecker {
 	
 	@Override
 	public String findDegree() {
-		StringBuilder sb = new StringBuilder();
+
+		ArrayList<FontGroupBlock> searchBlocks = new ArrayList<FontGroupBlock>();
+		//Find appropriate blocks to search through
 		if(titlePage != -1){
 			for (FontGroupBlock fb : fontGroupings){
 				if (fb.getPageNum() == titlePage){
-					sb.append(" " + fb.getText().replaceAll("\\s+", " "));
+					searchBlocks.add(fb);
 				}
 			}
-		}else{
-			for (FontGroupBlock fb : fontGroupings){
-				sb.append(" " + fb.getText().replaceAll("\\s+", " "));
+		}
+		
+		//Search for master/doctor word count in likely places
+		int mastersCount = 0;
+		int doctorsCount = 0;
+		
+		if(searchBlocks.size() > 0){
+			for(FontGroupBlock fb : searchBlocks){
+				mastersCount += findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
+				doctorsCount += findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
 			}
 		}
-
-		String text = sb.toString();
 		
-		int mastersCount = findOccurrences(text, "master");
-		int doctorsCount = findOccurrences(text, "doctor");
+		//If not found, search everywhere
+		if(mastersCount + doctorsCount == 0){
+			for(FontGroupBlock fb : fontGroupings){
+				mastersCount += findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
+				doctorsCount += findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+			}
+		}
+		
 		
 		if(mastersCount > doctorsCount){
 			return "Masters";
@@ -164,21 +180,13 @@ public class UOAReportChecker implements ReportChecker {
 	}
 	
 	//=========================================================================
-	//Unimplemented
-	private int findOccurrences(String text, String subString){
-		int lastIndex = 0;
+	//Private helper methods
+	private int findOccurrences(String text, Pattern pattern){
 		int count = 0;
+		Matcher m = pattern.matcher(text);
 		
-		text = text.toLowerCase();
-		subString = subString.toLowerCase();
-
-		while(lastIndex != -1){
-		    lastIndex = text.indexOf(subString,lastIndex);
-
-		    if(lastIndex != -1){
-		        count ++;
-		        lastIndex += subString.length();
-		    }
+		while(m.find()){
+			count++;
 		}
 		return count;
 	}
