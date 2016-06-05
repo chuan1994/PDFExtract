@@ -2,8 +2,10 @@ package reportCheckers.UOA;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import reportCheckers.ReportChecker;
 import main.MetadataStorer;
@@ -106,33 +108,57 @@ public class UOAReportChecker implements ReportChecker {
 		}
 		
 		//Search for master/doctor word count in likely places
-		int mastersCount = 0;
-		int doctorsCount = 0;
+		
+		ArrayList<FontGroupBlock> foundMaster = new ArrayList<FontGroupBlock>();
+		ArrayList<FontGroupBlock> foundDoctor = new ArrayList<FontGroupBlock>();
 		
 		if(searchBlocks.size() > 0){
 			for(FontGroupBlock fb : searchBlocks){
-				mastersCount += findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
-				doctorsCount += findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int masterIncr = findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int doctorIncr = findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				
+				if(masterIncr != 0){
+					foundMaster.add(fb);
+				}
+				
+				if(doctorIncr != 0){
+					foundDoctor.add(fb);
+				}
+				
 			}
 		}
 		
 		//If not found, search everywhere
-		if(mastersCount + doctorsCount == 0){
+		if(foundMaster.size() + foundDoctor.size() == 0){
 			for(FontGroupBlock fb : fontGroupings){
-				mastersCount += findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
-				doctorsCount += findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int masterIncr = findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int doctorIncr = findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				
+				if(masterIncr != 0){
+					foundMaster.add(fb);
+				}
+				if(doctorIncr != 0){
+					foundDoctor.add(fb);
+				}
 			}
 		}
 		
-		
-		if(mastersCount > doctorsCount){
-			return "Masters";
+		//Generating according to findings regex to find degree name
+		String result = "";
+		if(foundMaster.size() > foundDoctor.size()){
+			result = findCommon(foundMaster,Pattern.compile("((?i)(master)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+			
 		}
-		else if(doctorsCount > mastersCount){
-			return "Doctors";
+		else if(foundDoctor.size() > foundMaster.size()){
+			result = findCommon(foundDoctor,Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+			
+		}
+		else{
+			Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)");
+			result = findCommon(fontGroupings,Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
 		}
 		
-		return null;
+		return result;
 	}
 
 	@Override
@@ -189,5 +215,34 @@ public class UOAReportChecker implements ReportChecker {
 			count++;
 		}
 		return count;
+	}
+	
+	private String findCommon(ArrayList<FontGroupBlock> blocks, Pattern p){
+		ArrayList<String> results = new ArrayList<String>();
+
+		for(FontGroupBlock f: blocks){
+			String searchText = f.getText();
+			if(fontGroupings.contains(f)){
+				searchText = (searchText + " " + (fontGroupings.get(fontGroupings.indexOf(f) + 1)).getText()).replaceAll("\n"," ").replaceAll("  ", " ");
+			}
+			Matcher m = p.matcher(searchText);
+			
+			while(m.find()){
+				results.add(m.group());
+			}
+		}
+
+		Map<String, Long>  map = results.stream().collect(Collectors.groupingBy(w -> w, Collectors.counting()));
+		String result = "";
+		long count = 0;
+		
+		for(String x: map.keySet()){
+			if(map.get(x) > count){
+				count = map.get(x);
+				result = x;
+			}
+		}
+		
+		return result;
 	}
 }
