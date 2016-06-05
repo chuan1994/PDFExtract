@@ -109,28 +109,59 @@ public class UOAReportChecker implements ReportChecker {
 		int mastersCount = 0;
 		int doctorsCount = 0;
 		
+		ArrayList<FontGroupBlock> foundMaster = new ArrayList<FontGroupBlock>();
+		ArrayList<FontGroupBlock> foundDoctor = new ArrayList<FontGroupBlock>();
+		
 		if(searchBlocks.size() > 0){
 			for(FontGroupBlock fb : searchBlocks){
-				mastersCount += findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
-				doctorsCount += findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int masterIncr = findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int doctorIncr = findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				
+				if(masterIncr != 0){
+					foundMaster.add(fb);
+					mastersCount += masterIncr;
+				}
+				
+				if(doctorIncr != 0){
+					foundDoctor.add(fb);
+					doctorsCount += doctorIncr;
+				}
+				
 			}
 		}
 		
 		//If not found, search everywhere
 		if(mastersCount + doctorsCount == 0){
 			for(FontGroupBlock fb : fontGroupings){
-				mastersCount += findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
-				doctorsCount += findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int masterIncr = findOccurrences(fb.getText(), Pattern.compile("\\bmaster(s)?\\b",Pattern.CASE_INSENSITIVE));
+				int doctorIncr = findOccurrences(fb.getText(), Pattern.compile("\\bdoctor(s)?\\b",Pattern.CASE_INSENSITIVE));
+				
+				if(masterIncr != 0){
+					foundMaster.add(fb);
+					mastersCount += masterIncr;
+				}
+				
+				if(doctorIncr != 0){
+					foundDoctor.add(fb);
+					doctorsCount += doctorIncr;
+				}
+				
 			}
 		}
 		
-		
+		//Generating heading regex to find degree name
+		String type = "";
 		if(mastersCount > doctorsCount){
-			return "Masters";
+			type = "((?i)\\bmaster(s)?\\b)";
 		}
 		else if(doctorsCount > mastersCount){
-			return "Doctors";
+			type = "((?i)\\bdoctor(s)?\\b)";
 		}
+		else{
+			type = "((?i)\\b(doctor|master)(s)?\\b)";
+		}
+		
+		//Find degree
 		
 		return null;
 	}
