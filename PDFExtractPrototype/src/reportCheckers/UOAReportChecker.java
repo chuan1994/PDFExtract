@@ -31,7 +31,7 @@ public class UOAReportChecker implements ReportChecker {
 		float max = maxFontSize();
 		String title = "";
 		for (FontGroupBlock fgb : this.fontGroupings){
-			if(fgb.getFontSize() == max && fgb.getPageNum() <= 3){
+			if(fgb.getFontSize() == max){
 				this.titleFGB = fgb;
 				title = fgb.getText();
 			}
@@ -41,7 +41,8 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String[] findAuthor() {
-		String[] author = {""};
+		String author = "";
+		String authorArray[] = new String[]{null};
 		boolean isName;
 		for (int i=0; i< this.fontGroupings.size(); i++){
 			if(this.fontGroupings.get(i) == this.titleFGB){
@@ -50,20 +51,24 @@ public class UOAReportChecker implements ReportChecker {
 		}
 		for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
 			isName = true;
-			author[0] = this.fontGroupings.get(i).getText();
-			String authorName[] = author[0].split(" ");
+			author = this.fontGroupings.get(i).getText();
+			String authorName[] = author.split(" ");
 				
 			for(String name : authorName){
 				if (!Character.isUpperCase(name.charAt(0))){
 					isName = false;
+				} else {
+					isName = true;
 				}
 			}
 			if(isName){
-				return author;
+				authorArray[0] = author;
+				return authorArray;
 			}
 		}
-		return author;
+		return authorArray;
 	}
+
 
 	@Override
 	public String findAbstract() {
@@ -71,16 +76,17 @@ public class UOAReportChecker implements ReportChecker {
 		int abstIndex = 0;
 		String abst;
 		String abstContent = "";
-		while (!isAbstract){
-			for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
-				abst = this.fontGroupings.get(i).getText();
-				if (abst.toLowerCase().equals("abstract")){
-					abstIndex = i;
-					isAbstract = true;
-				}
+
+		for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
+			abst = this.fontGroupings.get(i).getText();
+			if (abst.toLowerCase().equals("abstract")){
+				abstIndex = i;
+				isAbstract = true;
 			}
 		}
+
 		abstContent = this.fontGroupings.get(abstIndex + 1).getText();
+		
 		return abstContent;
 
 	}
@@ -100,11 +106,12 @@ public class UOAReportChecker implements ReportChecker {
 	public float maxFontSize() {
 		float maxFontSize = 0;
 		
-		for(FontGroupBlock fg : this.fontGroupings) {
-			if (fg.getFontSize() >= maxFontSize){
-				maxFontSize = fg.getFontSize();
+		
+		for(FontGroupBlock fgb : this.fontGroupings) {
+			if (fgb.getFontSize() >= maxFontSize && fgb.getPageNum() <= 3){
+				maxFontSize = fgb.getFontSize();
 			}
-		}		
+		}
 		return maxFontSize;
 	}
 	
