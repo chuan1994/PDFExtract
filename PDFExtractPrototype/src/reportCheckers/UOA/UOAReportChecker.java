@@ -15,7 +15,7 @@ public class UOAReportChecker implements ReportChecker {
 
 	ArrayList<FontGroupBlock> fontGroupings = new ArrayList<FontGroupBlock>();
 	FontGroupBlock titleFGB = new FontGroupBlock(null, 0, null, 0);
-	int titleIndex = 0;
+	int titleIndex = -1;
 	int titlePage = -1;
 	
 	public UOAReportChecker(ArrayList<FontGroupBlock> fontGroupings){
@@ -43,6 +43,7 @@ public class UOAReportChecker implements ReportChecker {
 			if(fgb.getFontSize() == max && fgb.getPageNum() <= 3){
 				this.titleFGB = fgb;
 				this.titlePage = fgb.getPageNum();
+				this.titleIndex = fontGroupings.indexOf(fgb);
 				title = fgb.getText();
 			}
 		}
@@ -52,24 +53,14 @@ public class UOAReportChecker implements ReportChecker {
 	@Override
 	public String[] findAuthor() {
 		String[] author = {""};
-		boolean isName;
-		for (int i=0; i< this.fontGroupings.size(); i++){
-			if(this.fontGroupings.get(i) == this.titleFGB){
-				this.titleIndex = i;
-			}		
-		}
+
 		for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
-			isName = true;
-			author[0] = this.fontGroupings.get(i).getText();
-			String authorName[] = author[0].split(" ");
-				
-			for(String name : authorName){
-				if (!Character.isUpperCase(name.charAt(0))){
-					isName = false;
-				}
-			}
-			if(isName){
-				return author;
+			String text = this.fontGroupings.get(i).getText();
+			
+			if(text.matches("(by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")){
+				author[0] = text;
+				//Theses can only have 1 author; do not need to keep finding names
+				break;
 			}
 		}
 		return author;
