@@ -60,11 +60,16 @@ public class MyPDFParser {
 			meta.print();
 			System.out.println("===========================================================");
 			UOAReportChecker checker2 = new UOAReportChecker(textGroups2);
-			meta = new MetadataStorer();
+			MetadataStorer meta1 = new MetadataStorer();
 			addSurfaceMeta();
-			meta = checker2.getAllMeta(meta);
+			meta1 = checker2.getAllMeta(meta1);
 			System.out.println("Output 2");
-			meta.print();
+			meta1.print();
+			System.out.println("===========================================================");
+			MetadataComparer mdc = new MetadataComparer();
+			MetadataStorer ms = mdc.mergeByNull(meta, meta1);
+			System.out.println("Merged Output");
+			ms.print();
 			System.out.println("===========================================================");
 			
 		} catch (IOException e) {
