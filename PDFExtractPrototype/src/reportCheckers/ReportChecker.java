@@ -11,6 +11,7 @@ public interface ReportChecker {
 	public String[] findAuthor();
 	public String findDegree();
 	public String findDiscipline();
+	public String findSupervisors();
 	public Date findPubDate();
 	public String findAbstract();
 	public String findPublisher();

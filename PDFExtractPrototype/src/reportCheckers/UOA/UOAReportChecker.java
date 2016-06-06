@@ -31,6 +31,7 @@ public class UOAReportChecker implements ReportChecker {
 		ms.setAuthors(findAuthor());
 		ms.setAltTitle(findSubtitle());
 		ms.setAbstractx(findAbstract());
+		ms.setSupervisors(findSupervisors());
 		ms.setDegree(findDegree());
 		ms.setDegreeDiscp(findDiscipline());
 		return ms;
@@ -57,9 +58,9 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
 			String text = this.fontGroupings.get(i).getText();
-			String[] split = text.split("(\\s*\n\\s*)|(\\s*\r\\s*)");
+			String[] split = text.split("(\\s*(\n?\r)\\s*)");
 			for (String x : split) {
-				x = x.replaceAll("\n", "").replaceAll("\r", "");
+				x = x.replaceAll("\n?\r", "");
 				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.))+)")
 						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.))+)")) {
 
@@ -89,8 +90,6 @@ public class UOAReportChecker implements ReportChecker {
 					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
 				return "";
 			}
-
-
 			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
 		}
 
@@ -219,6 +218,27 @@ public class UOAReportChecker implements ReportChecker {
 		return null;
 	}
 
+	@Override
+	public String findSupervisors() {
+		String results = "";
+		Pattern p = Pattern
+				.compile("(supervisor(s?), )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+)((and |, )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+))*");
+
+		ArrayList<FontGroupBlock> possibleIndexes = new ArrayList<FontGroupBlock>();
+		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
+			if (fontGroupings.get(i).getText().toLowerCase()
+					.contains("acknowledgment")) {
+				if (i + 1 < fontGroupings.size())
+					possibleIndexes.add(fontGroupings.get(i + 1));
+			}
+		}
+
+		String returnVal = findCommon(possibleIndexes, p);
+		returnVal = returnVal.replaceAll("(?i)supervisor(s?), ", "").replaceAll(" (?!\\b)","");
+
+		return returnVal;
+	}
+
 	// =========================================================================
 	// Private helper methods
 	private float maxFontSize(int startPage, int endPage) {
@@ -248,10 +268,11 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (FontGroupBlock f : blocks) {
 			String searchText = f.getText();
-			if (fontGroupings.contains(f)) {
+			if (fontGroupings.contains(f)
+					&& fontGroupings.indexOf(f) + 1 < fontGroupings.size()) {
 				searchText = (searchText + " " + (fontGroupings
 						.get(fontGroupings.indexOf(f) + 1)).getText())
-						.replaceAll("\n", " ").replaceAll("  ", " ");
+						.replaceAll("\n?\r", " ").replaceAll("  ", " ");
 			}
 			Matcher m = p.matcher(searchText);
 
@@ -274,4 +295,5 @@ public class UOAReportChecker implements ReportChecker {
 
 		return result;
 	}
+
 }
