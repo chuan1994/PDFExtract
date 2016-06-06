@@ -30,7 +30,7 @@ public class UOAReportChecker implements ReportChecker {
 		ms.setTitle(findTitle());
 		ms.setAuthors(findAuthor());
 		ms.setAltTitle(findSubtitle());
-		// ms.setAbstractx(findAbstract());
+		ms.setAbstractx(findAbstract());
 		ms.setSupervisors(findSupervisors());
 		ms.setDegree(findDegree());
 		ms.setDegreeDiscp(findDiscipline());
@@ -46,7 +46,7 @@ public class UOAReportChecker implements ReportChecker {
 				this.titleFGB = fgb;
 				this.titlePage = fgb.getPageNum();
 				this.titleIndex = fontGroupings.indexOf(fgb);
-				title = fgb.getText();
+				title = fgb.getText().replaceAll("\n", " ").replaceAll("\r", " ").replaceAll("  ", " ");
 			}
 		}
 		return title;
@@ -90,8 +90,7 @@ public class UOAReportChecker implements ReportChecker {
 					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
 				return "";
 			}
-
-			return fontGroupings.get(titleIndex + 1).getText();
+			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
 		}
 
 		return "";
@@ -99,20 +98,21 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findAbstract() {
-		boolean isAbstract = false;
 		int abstIndex = 0;
 		String abst;
 		String abstContent = "";
-		while (!isAbstract) {
-			for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
-				abst = this.fontGroupings.get(i).getText();
-				if (abst.toLowerCase().equals("abstract")) {
-					abstIndex = i;
-					isAbstract = true;
-				}
+		for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
+			abst = this.fontGroupings.get(i).getText();
+			if (abst.toLowerCase().contains("abstract")) {
+				abstIndex = i;
 			}
 		}
-		abstContent = this.fontGroupings.get(abstIndex + 1).getText();
+		for (int i = abstIndex + 1; i < this.fontGroupings.size(); i++) {
+			abstContent = this.fontGroupings.get(i).getText();
+			if(abstContent.split(" ").length > 20) {
+				return abstContent.replaceAll("(\r?\n){2,}", "\r\n");
+			}
+		}
 		return abstContent;
 	}
 
