@@ -140,7 +140,10 @@ public class MetadataStorer {
 		System.out.println(this.altTitle);
 
 		System.out.print("Authors: ");
-		if (authors.length > 0) {
+		if(authors == null){
+			System.out.println(this.authors);
+		}
+		else if (authors.length > 0) {
 			for (int i = 0; i < authors.length - 1; i++) {
 				System.out.print(this.authors[i] + ", ");
 			}
@@ -176,4 +179,6 @@ public class MetadataStorer {
 		System.out.print("Page Size: ");
 		System.out.println(this.pageSize);
 	}
+	
+	
 }
