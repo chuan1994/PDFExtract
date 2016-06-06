@@ -30,7 +30,7 @@ public class UOAReportChecker implements ReportChecker {
 		ms.setTitle(findTitle());
 		ms.setAuthors(findAuthor());
 		ms.setAltTitle(findSubtitle());
-//		 ms.setAbstractx(findAbstract());
+		// ms.setAbstractx(findAbstract());
 		ms.setDegree(findDegree());
 		ms.setDegreeDiscp(findDiscipline());
 		return ms;
@@ -39,7 +39,6 @@ public class UOAReportChecker implements ReportChecker {
 	@Override
 	public String findTitle() {
 		float max = maxFontSize(0, 2);
-		System.out.println(max);
 		String title = "";
 		for (FontGroupBlock fgb : this.fontGroupings) {
 			if (fgb.getFontSize() == max && fgb.getPageNum() <= 3) {
@@ -58,17 +57,22 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
 			String text = this.fontGroupings.get(i).getText();
-			String[] split = text.split("\n");
+			String[] split = text.split("(\\s*\n\\s*)|(\\s*\r\\s*)");
 			for (String x : split) {
-				if (x.matches("(by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")
-						|| x.matches("(by)?(([A-Z](')?[A-Z]*(-)?)( |\\b))*")) {
-					if (x.startsWith("by ")) {
-						x.replace("by ", "");
+				x = x.replaceAll("\n", "").replaceAll("\r", "");
+				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.))+)")
+						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.))+)")) {
+
+					if (x.startsWith("by") || x.startsWith("By")) {
+						x = x.replace("by", "");
+						x = x.replace("By", "");
+						if (x.length() == 0) {
+							continue;
+						}
 					}
 					author[0] = x;
-					// Theses can only have 1 author; do not need to keep
-					// finding
-					// names
+					// Theses can only have 1 author;
+					// do not need to keep finding names
 					return author;
 				}
 			}
@@ -79,8 +83,10 @@ public class UOAReportChecker implements ReportChecker {
 	@Override
 	public String findSubtitle() {
 		if (titleIndex != -1) {
-			if (fontGroupings.get(titleIndex + 1).getText()
-					.matches("(by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
+			if (fontGroupings
+					.get(titleIndex + 1)
+					.getText()
+					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
 				return "";
 			}
 
