@@ -110,7 +110,10 @@ public class UOAReportChecker implements ReportChecker {
 		for (int i = abstIndex + 1; i < this.fontGroupings.size(); i++) {
 			abstContent = this.fontGroupings.get(i).getText();
 			if(abstContent.split(" ").length > 20) {
-				return abstContent.replaceAll("(\r?\n){2,}", "\r\n");
+				String[] splitAbstract = abstContent.split("(\r?\n){2,}");
+				if(splitAbstract.length > 2) {
+					return splitAbstract[0];
+				}
 			}
 		}
 		return abstContent;
