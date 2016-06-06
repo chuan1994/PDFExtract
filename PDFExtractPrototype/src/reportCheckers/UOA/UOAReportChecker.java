@@ -51,7 +51,8 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String[] findAuthor() {
-		String[] author = {""};
+		String author = "";
+		String authorArray[] = new String[]{};
 		boolean isName;
 		for (int i=0; i< this.fontGroupings.size(); i++){
 			if(this.fontGroupings.get(i) == this.titleFGB){
@@ -60,19 +61,22 @@ public class UOAReportChecker implements ReportChecker {
 		}
 		for (int i=this.titleIndex + 1; i< this.fontGroupings.size(); i++){
 			isName = true;
-			author[0] = this.fontGroupings.get(i).getText();
-			String authorName[] = author[0].split(" ");
+			author = this.fontGroupings.get(i).getText();
+			String authorName[] = author.split(" ");
 				
 			for(String name : authorName){
 				if (!Character.isUpperCase(name.charAt(0))){
 					isName = false;
+				} else {
+					isName = true;
 				}
 			}
 			if(isName){
-				return author;
+				authorArray[0] = author;
+				return authorArray;
 			}
 		}
-		return author;
+		return authorArray;
 	}
 
 	@Override
