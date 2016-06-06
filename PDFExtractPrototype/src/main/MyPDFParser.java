@@ -45,7 +45,7 @@ public class MyPDFParser {
 				myStripper.setEndPage(i);
 				sb.append("\n" + myStripper.getText(pdDoc));
 			}
-			
+
 			String text = sb.toString();
 			
 			ArrayList<FontGroupBlock> textGroups1 = myStripper.getFontGroups();

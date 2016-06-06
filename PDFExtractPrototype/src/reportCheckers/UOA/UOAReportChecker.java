@@ -90,8 +90,10 @@ public class UOAReportChecker implements ReportChecker {
 				return "";
 			}
 
+
 			return fontGroupings.get(titleIndex + 1).getText();
 		}
+
 		return "";
 	}
 
