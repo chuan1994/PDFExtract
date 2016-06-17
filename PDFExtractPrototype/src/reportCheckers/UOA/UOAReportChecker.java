@@ -39,16 +39,16 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findTitle() {
-		float max = maxFontSize(0, 2);
 		String title = "";
-		for (FontGroupBlock fgb : this.fontGroupings) {
-			if (fgb.getFontSize() == max && fgb.getPageNum() <= 3) {
-				this.titleFGB = fgb;
-				this.titlePage = fgb.getPageNum();
-				this.titleIndex = fontGroupings.indexOf(fgb);
-				title = fgb.getText().replaceAll("\n", " ").replaceAll("\r", " ").replaceAll("  ", " ");
-			}
+		ArrayList<FontGroupBlock> temp = getPageBlocks(2);
+		if(temp.size() < 3){
+			temp = getPageBlocks(3);
 		}
+		FontGroupBlock titleBlock = maxFontSizeBlock(temp);
+		
+		titleIndex = fontGroupings.indexOf(titleBlock);
+		
+		title = titleBlock.getText();
 		return title;
 	}
 
@@ -61,8 +61,8 @@ public class UOAReportChecker implements ReportChecker {
 			String[] split = text.split("(\\s*(\n?\r)\\s*)");
 			for (String x : split) {
 				x = x.replaceAll("\n?\r", "");
-				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.))+)")
-						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.))+)")) {
+				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
+						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.)){2,})")) {
 
 					if (x.startsWith("by") || x.startsWith("By")) {
 						x = x.replace("by", "");
@@ -83,16 +83,16 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findSubtitle() {
-		if (titleIndex != -1) {
-			if (fontGroupings
-					.get(titleIndex + 1)
-					.getText()
-					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
-				return "";
-			}
-			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
-		}
-
+//		if (titleIndex != -1) {
+//			if (fontGroupings
+//					.get(titleIndex + 1)
+//					.getText()
+//					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
+//				return "";
+//			}
+//			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
+//		}
+//
 		return "";
 	}
 
@@ -177,18 +177,18 @@ public class UOAReportChecker implements ReportChecker {
 		if (foundMaster.size() > foundDoctor.size()) {
 			result = findCommon(
 					foundMaster,
-					Pattern.compile("((?i)(master)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+					Pattern.compile("((?i)(master)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 
 		} else if (foundDoctor.size() > foundMaster.size()) {
 			result = findCommon(
 					foundDoctor,
-					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 
 		} else {
-			Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)");
+			Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)");
 			result = findCommon(
 					fontGroupings,
-					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 		}
 
 		return result;
@@ -244,16 +244,17 @@ public class UOAReportChecker implements ReportChecker {
 
 	// =========================================================================
 	// Private helper methods
-	private float maxFontSize(int startPage, int endPage) {
+	private FontGroupBlock maxFontSizeBlock(ArrayList<FontGroupBlock> group) {
 		float maxFontSize = 0;
-
-		for (FontGroupBlock fg : this.fontGroupings) {
-			if (fg.getFontSize() >= maxFontSize && fg.getPageNum() >= startPage
-					&& fg.getPageNum() <= endPage) {
+		FontGroupBlock returnVal = group.get(0);
+		
+		for (FontGroupBlock fg : group) {
+			if (fg.getFontSize() > maxFontSize){
 				maxFontSize = fg.getFontSize();
+				returnVal = fg;
 			}
 		}
-		return maxFontSize;
+		return returnVal;
 	}
 
 	private int findOccurrences(String text, Pattern pattern) {
@@ -297,6 +298,17 @@ public class UOAReportChecker implements ReportChecker {
 		}
 
 		return result;
+	}
+	
+	
+	private ArrayList<FontGroupBlock> getPageBlocks(int pageNumber){
+		ArrayList<FontGroupBlock> group = new ArrayList<FontGroupBlock>();
+		for(FontGroupBlock block: fontGroupings){
+			if(block.getPageNum() == pageNumber){
+				group.add(block);
+			}
+		}
+		return group;
 	}
 
 }
