@@ -61,8 +61,8 @@ public class UOAReportChecker implements ReportChecker {
 			String[] split = text.split("(\\s*(\n?\r)\\s*)");
 			for (String x : split) {
 				x = x.replaceAll("\n?\r", "");
-				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.))+)")
-						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.))+)")) {
+				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
+						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.)){2,})")) {
 
 					if (x.startsWith("by") || x.startsWith("By")) {
 						x = x.replace("by", "");
@@ -83,16 +83,16 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findSubtitle() {
-		if (titleIndex != -1) {
-			if (fontGroupings
-					.get(titleIndex + 1)
-					.getText()
-					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
-				return "";
-			}
-			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
-		}
-
+//		if (titleIndex != -1) {
+//			if (fontGroupings
+//					.get(titleIndex + 1)
+//					.getText()
+//					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
+//				return "";
+//			}
+//			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
+//		}
+//
 		return "";
 	}
 
@@ -177,18 +177,18 @@ public class UOAReportChecker implements ReportChecker {
 		if (foundMaster.size() > foundDoctor.size()) {
 			result = findCommon(
 					foundMaster,
-					Pattern.compile("((?i)(master)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+					Pattern.compile("((?i)(master)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 
 		} else if (foundDoctor.size() > foundMaster.size()) {
 			result = findCommon(
 					foundDoctor,
-					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 
 		} else {
-			Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)");
+			Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)");
 			result = findCommon(
 					fontGroupings,
-					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)*)"));
+					Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 		}
 
 		return result;
