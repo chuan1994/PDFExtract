@@ -47,8 +47,9 @@ public class UOAReportChecker implements ReportChecker {
 		FontGroupBlock titleBlock = maxFontSizeBlock(temp);
 		
 		titleIndex = fontGroupings.indexOf(titleBlock);
-		
+		titlePage = titleBlock.getPageNum();
 		title = titleBlock.getText();
+		
 		return title;
 	}
 
@@ -98,25 +99,47 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findAbstract() {
-		int abstIndex = 0;
+		FontGroupBlock abstBlock = null;
 		String abst;
 		String abstContent = "";
-		for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
-			abst = this.fontGroupings.get(i).getText();
-			if (abst.toLowerCase().contains("abstract")) {
-				abstIndex = i;
+		int titleOffSet = 1;
+		boolean found = false;
+		
+		while(!found){
+			if(titlePage+titleOffSet > 5){
+				found = true;
+				break;
 			}
-		}
-		for (int i = abstIndex + 1; i < this.fontGroupings.size(); i++) {
-			abstContent = this.fontGroupings.get(i).getText();
-			if(abstContent.split(" ").length > 20) {
-				String[] splitAbstract = abstContent.split("(\r?\n){2,}");
-				if(splitAbstract.length > 2) {
-					return splitAbstract[0];
+			ArrayList<FontGroupBlock> pageBlock = getPageBlocks(titlePage + titleOffSet);
+			for (FontGroupBlock f : pageBlock) {
+				FontGroupBlock abstTitle;
+				
+				abst = f.getText();
+				if (abst.toLowerCase().contains("abstract")) {
+					abstTitle = f;
+					found = true;
+					int index = fontGroupings.indexOf(abstTitle);
+					if(found && (index + 1 < fontGroupings.size())){		
+						abstBlock = fontGroupings.get(index + 1);
+						
+						if(!(abstContent.split("//s+").length > 20)){
+							found = false;
+							continue;
+						}
+					}
 				}
 			}
+			
+			titleOffSet++;
 		}
-		return abstContent;
+		
+		
+		if(abstBlock == null){
+			return null;
+		}
+		
+		return abstBlock.getText();
+		
 	}
 
 	@Override
@@ -193,6 +216,27 @@ public class UOAReportChecker implements ReportChecker {
 
 		return result;
 	}
+	
+	@Override
+	public String findSupervisors() {
+		String results = "";
+		Pattern p = Pattern
+				.compile("(supervisor(s?), )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+)((and |, )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+))*");
+
+		ArrayList<FontGroupBlock> possibleIndexes = new ArrayList<FontGroupBlock>();
+		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
+			if (fontGroupings.get(i).getText().toLowerCase()
+					.contains("acknowledgment")) {
+				if (i + 1 < fontGroupings.size())
+					possibleIndexes.add(fontGroupings.get(i + 1));
+			}
+		}
+
+		String returnVal = findCommon(possibleIndexes, p);
+		returnVal = returnVal.replaceAll("(?i)supervisor(s?), ", "").replaceAll(" (?!\\b)","");
+
+		return returnVal;
+	}
 
 	// =========================================================================
 	// Unimplemented
@@ -220,28 +264,6 @@ public class UOAReportChecker implements ReportChecker {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public String findSupervisors() {
-		String results = "";
-		Pattern p = Pattern
-				.compile("(supervisor(s?), )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+)((and |, )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+))*");
-
-		ArrayList<FontGroupBlock> possibleIndexes = new ArrayList<FontGroupBlock>();
-		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
-			if (fontGroupings.get(i).getText().toLowerCase()
-					.contains("acknowledgment")) {
-				if (i + 1 < fontGroupings.size())
-					possibleIndexes.add(fontGroupings.get(i + 1));
-			}
-		}
-
-		String returnVal = findCommon(possibleIndexes, p);
-		returnVal = returnVal.replaceAll("(?i)supervisor(s?), ", "").replaceAll(" (?!\\b)","");
-
-		return returnVal;
-	}
-
 	// =========================================================================
 	// Private helper methods
 	private FontGroupBlock maxFontSizeBlock(ArrayList<FontGroupBlock> group) {
@@ -276,7 +298,7 @@ public class UOAReportChecker implements ReportChecker {
 					&& fontGroupings.indexOf(f) + 1 < fontGroupings.size()) {
 				searchText = (searchText + " " + (fontGroupings
 						.get(fontGroupings.indexOf(f) + 1)).getText())
-						.replaceAll("\n?\r", " ").replaceAll("  ", " ");
+						.replaceAll("(\n?\r)+", " ").replaceAll("  ", " ");
 			}
 			Matcher m = p.matcher(searchText);
 
@@ -310,5 +332,4 @@ public class UOAReportChecker implements ReportChecker {
 		}
 		return group;
 	}
-
 }
