@@ -49,6 +49,9 @@ public class MyPDFParser {
 			String text = sb.toString();
 			
 			ArrayList<FontGroupBlock> textGroups1 = myStripper.getFontGroups();
+			for(FontGroupBlock f : textGroups1){
+				f.print();
+			}
 			ArrayList<FontGroupBlock> textGroups2 = splitOutcome(text);
 			
 			System.out.println("===========================================================");
@@ -138,4 +141,5 @@ public class MyPDFParser {
 		
 		return fgb;
 	}
+
 }
