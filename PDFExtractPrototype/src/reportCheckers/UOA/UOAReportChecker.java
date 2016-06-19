@@ -328,7 +328,7 @@ public class UOAReportChecker implements ReportChecker {
 
 	private String reduce(String value) {
 		String[] firstBlock = value.split("(\r?\n){2,}");
-		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ");
+		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ").trim();
 
 		return returnVal;
 	}
