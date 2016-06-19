@@ -59,9 +59,9 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
 			String text = this.fontGroupings.get(i).getText();
-			String[] split = text.split("(\\s*(\n?\r)\\s*)");
+			String[] split = text.split("(\\s*(\r?\n)\\s*)");
 			for (String x : split) {
-				x = x.replaceAll("\n?\r", "");
+				x = x.replaceAll("\r?\n", "");
 				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
 						|| x.matches("(((?i)by )?)(([A-Z]+('?)[A-Z]+(-| |\\b|\\.)){2,})")) {
 
@@ -94,7 +94,7 @@ public class UOAReportChecker implements ReportChecker {
 //			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
 //		}
 //
-		return "";
+		return null;
 	}
 
 	@Override
@@ -121,15 +121,17 @@ public class UOAReportChecker implements ReportChecker {
 					int index = fontGroupings.indexOf(abstTitle);
 					if(found && (index + 1 < fontGroupings.size())){		
 						abstBlock = fontGroupings.get(index + 1);
-						
-						if(!(abstContent.split("//s+").length > 20)){
+						abstContent = abstBlock.getText();
+						if(!(abstContent.split(" ").length > 20)){
 							found = false;
 							continue;
 						}
+						
+						break;
 					}
+					
 				}
 			}
-			
 			titleOffSet++;
 		}
 		
@@ -146,20 +148,18 @@ public class UOAReportChecker implements ReportChecker {
 	public String findDegree() {
 
 		ArrayList<FontGroupBlock> searchBlocks = new ArrayList<FontGroupBlock>();
-		// Find appropriate blocks to search through
-		if (titlePage != -1) {
-			for (FontGroupBlock fb : fontGroupings) {
-				if (fb.getPageNum() == titlePage) {
-					searchBlocks.add(fb);
-				}
-			}
-		}
-
-		// Search for master/doctor word count in likely places
-
 		ArrayList<FontGroupBlock> foundMaster = new ArrayList<FontGroupBlock>();
 		ArrayList<FontGroupBlock> foundDoctor = new ArrayList<FontGroupBlock>();
-
+		
+		// Find appropriate blocks to search through
+		if (titlePage != -1 && titleIndex != -1) {
+			int index = titleIndex;
+			while(fontGroupings.size() > index && fontGroupings.get(index).getPageNum() == titlePage){
+				searchBlocks.add(fontGroupings.get(index));
+				index++;
+			}
+		}
+		// Search for master/doctor word count on title page
 		if (searchBlocks.size() > 0) {
 			for (FontGroupBlock fb : searchBlocks) {
 				int masterIncr = findOccurrences(fb.getText(), Pattern.compile(
@@ -298,7 +298,7 @@ public class UOAReportChecker implements ReportChecker {
 					&& fontGroupings.indexOf(f) + 1 < fontGroupings.size()) {
 				searchText = (searchText + " " + (fontGroupings
 						.get(fontGroupings.indexOf(f) + 1)).getText())
-						.replaceAll("(\n?\r)+", " ").replaceAll("  ", " ");
+						.replaceAll("(\r?\n)+", " ").replaceAll("  ", " ");
 			}
 			Matcher m = p.matcher(searchText);
 
