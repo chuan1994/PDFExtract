@@ -47,7 +47,7 @@ public class UOAReportChecker implements ReportChecker {
 			contents.append(f.getText() + " ");
 		}
 		
-		if(contents.toString().split(" ").length < 5){
+		if(contents.toString().split(" ").length < 8){
 			temp = getPageBlocks(3);
 		}
 		FontGroupBlock titleBlock = maxFontSizeBlock(temp);
