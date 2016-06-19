@@ -41,7 +41,13 @@ public class UOAReportChecker implements ReportChecker {
 	public String findTitle() {
 		String title = "";
 		ArrayList<FontGroupBlock> temp = getPageBlocks(2);
-		if(temp.size() < 3){
+		StringBuilder contents = new StringBuilder();
+		
+		for(FontGroupBlock f : temp ){
+			contents.append(f.getText() + " ");
+		}
+		
+		if(contents.toString().split(" ").length < 5){
 			temp = getPageBlocks(3);
 		}
 		FontGroupBlock titleBlock = maxFontSizeBlock(temp);
