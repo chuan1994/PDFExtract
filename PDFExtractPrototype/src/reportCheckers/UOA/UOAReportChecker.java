@@ -13,8 +13,12 @@ import helperClasses.FontGroupBlock;
 
 public class UOAReportChecker implements ReportChecker {
 
+	MetadataStorer ms;
+
 	ArrayList<FontGroupBlock> fontGroupings = new ArrayList<FontGroupBlock>();
+
 	FontGroupBlock titleFGB = new FontGroupBlock(null, 0, null, 0);
+
 	int titleIndex = -1;
 	int titlePage = -1;
 	int degreeIndex = -1;
@@ -25,6 +29,7 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public MetadataStorer getAllMeta(MetadataStorer ms) {
+		this.ms = ms;
 		if (fontGroupings.size() == 0)
 			return ms;
 
@@ -79,6 +84,11 @@ public class UOAReportChecker implements ReportChecker {
 							continue;
 						}
 					}
+
+					if (ms.getTitle().contains(x)) {
+						continue;
+					}
+
 					author[0] = reduce(x);
 					// Theses can only have 1 author;
 					// do not need to keep finding names
@@ -168,23 +178,21 @@ public class UOAReportChecker implements ReportChecker {
 		// Generating according to findings regex to find degree name
 		String result = "";
 
-		Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)");
-		result = findCommon(fontGroupings, Pattern.compile("((?i)(doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
+		result = findCommon(fontGroupings, Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 
 		if (result.equals("")) {
 			degreeIndex = -1;
 			return null;
 		}
-		
-		
-		for(FontGroupBlock f : searchBlocks){
+
+		for (FontGroupBlock f : searchBlocks) {
 			String text = f.getText().replaceAll("\r?\n", " ").replaceAll("  ", " ");
-			if(text.contains(result)){
+			if (text.contains(result)) {
 				degreeIndex = fontGroupings.indexOf(f);
 				break;
 			}
 		}
-		
+
 		return reduce(result);
 	}
 
@@ -212,14 +220,39 @@ public class UOAReportChecker implements ReportChecker {
 		return reduce(returnVal);
 	}
 
-	// =========================================================================
-	// Unimplemented
-
 	@Override
 	public String findDiscipline() {
-		// TODO Auto-generated method stub
-		return null;
+		if (degreeIndex == -1) {
+			return null;
+		}
+		if (ms.getDegree() == null) {
+			return null;
+		}
+
+		String degree = ms.getDegree();
+		String result = "";
+		StringBuilder text = new StringBuilder();
+
+		text.append(fontGroupings.get(degreeIndex).getText());
+		if (degreeIndex + 1 < fontGroupings.size()) {
+			text.append(fontGroupings.get(degreeIndex + 1).getText());
+		}
+
+		Pattern p = Pattern.compile(degree + " in(( [A-Z][a-z]+)+)");
+		Matcher m = p.matcher(reduce(text.toString()));
+
+		if (m.find()) {
+			result = m.group(1);
+		}
+
+		if (result.equals("")) {
+			return null;
+		}
+
+		return reduce(result);
 	}
+	// =========================================================================
+	// Unimplemented
 
 	@Override
 	public Date findPubDate() {
@@ -292,11 +325,11 @@ public class UOAReportChecker implements ReportChecker {
 		}
 		return group;
 	}
-	
-	private String reduce(String value){
+
+	private String reduce(String value) {
 		String[] firstBlock = value.split("(\r?\n){2,}");
 		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ");
-		
+
 		return returnVal;
 	}
 }
