@@ -127,9 +127,10 @@ public class MyPDFParser {
 		
 		Matcher matcher = pattern.matcher(text);
 		while(matcher.find()){
-			String font = matcher.group(1).split(",")[0].replaceAll("(\\[|\\s+)", "");
-			float size = Float.parseFloat(matcher.group(1).split(",")[1].replaceAll("\\s+", ""));
-			int pageNum = Integer.parseInt(matcher.group(1).split(",")[2].replaceAll("(\\]|\\s+)", ""));
+			String[] fontInfo = matcher.group(1).split(",");
+			String font = fontInfo[0].replaceAll("(\\[|\\s+)", "");
+			float size = Float.parseFloat(fontInfo[fontInfo.length - 2].replaceAll("\\s+", ""));
+			int pageNum = Integer.parseInt(fontInfo[fontInfo.length - 1].replaceAll("(\\]|\\s+)", ""));
 			String texts = matcher.group(2);
 			
 			FontGroupBlock fg = new FontGroupBlock(font, size, texts, pageNum);
