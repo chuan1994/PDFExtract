@@ -72,7 +72,7 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
 			String text = this.fontGroupings.get(i).getText();
-			String[] split = text.split("(\\s*(\r?\n)\\s*)");
+			String[] split = text.trim().split("(\r?\n)");
 			for (String x : split) {
 				x = x.replaceAll("\r?\n", "");
 				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
@@ -106,11 +106,11 @@ public class UOAReportChecker implements ReportChecker {
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
-		
-		if(nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage){
-			return reduceOutput(subtitleText);	
+
+		if (nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage) {
+			return reduceOutput(subtitleText);
 		}
-		
+
 		return null;
 	}
 
@@ -136,23 +136,20 @@ public class UOAReportChecker implements ReportChecker {
 					abstTitle = f;
 					found = true;
 					int index = fontGroupings.indexOf(abstTitle);
-					
-					if(abstTitle.getText().split(" ").length > 5){
+
+					if (abstTitle.getText().split(" ").length > 5) {
 						abstBlock = abstTitle;
-						String [] blocks = abstBlock.getText().split("\n{2,}[\r]?");
+						String[] blocks = abstBlock.getText().split("(\r?\n){2,}");
 						abstContent = blocks[1];
-					}
-					else if (found && (index + 1 < fontGroupings.size())) {
+					} else if (found && (index + 1 < fontGroupings.size())) {
 						abstBlock = fontGroupings.get(index + 1);
 						abstContent = abstBlock.getText();
 						if (!(abstContent.split(" ").length > 20)) {
 							found = false;
 							continue;
 						}
-
 						break;
 					}
-
 				}
 			}
 			titleOffSet++;
@@ -163,7 +160,6 @@ public class UOAReportChecker implements ReportChecker {
 		}
 
 		return abstContent;
-
 	}
 
 	@Override
@@ -239,20 +235,19 @@ public class UOAReportChecker implements ReportChecker {
 		StringBuilder text = new StringBuilder();
 
 		text.append(fontGroupings.get(degreeIndex).getText());
-		
 
 		Pattern p = Pattern.compile(degree + " in(( [A-Z][a-z]+)+)");
 		Matcher m = p.matcher(singleLine(text.toString()));
 
 		if (m.find()) {
 			result = m.group(1);
-		}else{
+		} else {
 			if (degreeIndex + 1 < fontGroupings.size()) {
 				text.append(fontGroupings.get(degreeIndex + 1).getText());
 			}
-			
+
 			Matcher m2 = p.matcher(singleLine(text.toString()));
-			if(m2.find()){
+			if (m2.find()) {
 				result = m.group(1);
 			}
 		}
@@ -341,8 +336,8 @@ public class UOAReportChecker implements ReportChecker {
 
 		return returnVal;
 	}
-	
-	private String singleLine(String value){
+
+	private String singleLine(String value) {
 		return value.replaceAll("\\s+", " ").trim();
 	}
 }
