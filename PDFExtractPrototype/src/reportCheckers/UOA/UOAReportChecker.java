@@ -159,7 +159,7 @@ public class UOAReportChecker implements ReportChecker {
 			return null;
 		}
 
-		return abstContent;
+		return abstContent.trim();
 	}
 
 	@Override
@@ -236,7 +236,7 @@ public class UOAReportChecker implements ReportChecker {
 
 		text.append(fontGroupings.get(degreeIndex).getText());
 
-		Pattern p = Pattern.compile(degree + " in(( [A-Z][a-z]+)+)");
+		Pattern p = Pattern.compile(degree + " in(( (?!The\\b)[A-Z][a-z]+)+)");
 		Matcher m = p.matcher(singleLine(text.toString()));
 
 		if (m.find()) {
@@ -296,7 +296,6 @@ public class UOAReportChecker implements ReportChecker {
 
 	private String findCommon(ArrayList<FontGroupBlock> blocks, Pattern p) {
 		ArrayList<String> results = new ArrayList<String>();
-
 		for (FontGroupBlock f : blocks) {
 			String searchText = f.getText();
 
@@ -304,6 +303,18 @@ public class UOAReportChecker implements ReportChecker {
 
 			while (m.find()) {
 				results.add(m.group());
+			}
+			
+			if(results.size() == 0){
+				String[] split = searchText.split("(\r?\n){2,}");
+				for(String x: split){
+					searchText = x.replaceAll("\r?\n", " ").replaceAll("  ", " ");
+					m = p.matcher(searchText);
+					
+					while (m.find()){
+						results.add(m.group());
+					}
+				}
 			}
 		}
 
