@@ -63,7 +63,7 @@ public class UOAReportChecker implements ReportChecker {
 		titlePage = titleBlock.getPageNum();
 		title = titleBlock.getText();
 
-		return reduce(title);
+		return reduceOutput(title);
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class UOAReportChecker implements ReportChecker {
 						continue;
 					}
 
-					author[0] = reduce(x);
+					author[0] = reduceOutput(x);
 					// Theses can only have 1 author;
 					// do not need to keep finding names
 					this.authorIndex = i;
@@ -198,7 +198,7 @@ public class UOAReportChecker implements ReportChecker {
 			}
 		}
 
-		return reduce(result);
+		return reduceOutput(result);
 	}
 
 	@Override
@@ -222,7 +222,7 @@ public class UOAReportChecker implements ReportChecker {
 			return null;
 		}
 
-		return reduce(returnVal);
+		return reduceOutput(returnVal);
 	}
 
 	@Override
@@ -239,22 +239,29 @@ public class UOAReportChecker implements ReportChecker {
 		StringBuilder text = new StringBuilder();
 
 		text.append(fontGroupings.get(degreeIndex).getText());
-		if (degreeIndex + 1 < fontGroupings.size()) {
-			text.append(fontGroupings.get(degreeIndex + 1).getText());
-		}
+		
 
 		Pattern p = Pattern.compile(degree + " in(( [A-Z][a-z]+)+)");
-		Matcher m = p.matcher(reduce(text.toString()));
+		Matcher m = p.matcher(singleLine(text.toString()));
 
 		if (m.find()) {
 			result = m.group(1);
+		}else{
+			if (degreeIndex + 1 < fontGroupings.size()) {
+				text.append(fontGroupings.get(degreeIndex + 1).getText());
+			}
+			
+			Matcher m2 = p.matcher(singleLine(text.toString()));
+			if(m2.find()){
+				result = m.group(1);
+			}
 		}
 
 		if (result.equals("")) {
 			return null;
 		}
 
-		return reduce(result);
+		return reduceOutput(result);
 	}
 	// =========================================================================
 	// Unimplemented
@@ -331,10 +338,14 @@ public class UOAReportChecker implements ReportChecker {
 		return group;
 	}
 
-	private String reduce(String value) {
+	private String reduceOutput(String value) {
 		String[] firstBlock = value.split("(\r?\n){2,}");
 		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ").trim();
 
 		return returnVal;
+	}
+	
+	private String singleLine(String value){
+		return value.replaceAll("\\s+", " ").trim();
 	}
 }
