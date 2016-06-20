@@ -63,7 +63,7 @@ public class UOAReportChecker implements ReportChecker {
 		titlePage = titleBlock.getPageNum();
 		title = titleBlock.getText();
 
-		return reduce(title);
+		return reduceOutput(title);
 	}
 
 	@Override
@@ -72,7 +72,7 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
 			String text = this.fontGroupings.get(i).getText();
-			String[] split = text.split("(\\s*(\r?\n)\\s*)");
+			String[] split = text.trim().split("(\r?\n)");
 			for (String x : split) {
 				x = x.replaceAll("\r?\n", "");
 				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
@@ -90,7 +90,7 @@ public class UOAReportChecker implements ReportChecker {
 						continue;
 					}
 
-					author[0] = reduce(x);
+					author[0] = reduceOutput(x);
 					// Theses can only have 1 author;
 					// do not need to keep finding names
 					this.authorIndex = i;
@@ -106,11 +106,11 @@ public class UOAReportChecker implements ReportChecker {
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
-		
-		if(nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage){
-			return subtitleText;	
+
+		if (nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage) {
+			return reduceOutput(subtitleText);
 		}
-		
+
 		return null;
 	}
 
@@ -136,23 +136,20 @@ public class UOAReportChecker implements ReportChecker {
 					abstTitle = f;
 					found = true;
 					int index = fontGroupings.indexOf(abstTitle);
-					
-					if(abstTitle.getText().split(" ").length > 5){
+
+					if (abstTitle.getText().split(" ").length > 5) {
 						abstBlock = abstTitle;
-						String [] blocks = abstBlock.getText().split("\n{2,}[\r]?");
+						String[] blocks = abstBlock.getText().split("(\r?\n){2,}");
 						abstContent = blocks[1];
-					}
-					else if (found && (index + 1 < fontGroupings.size())) {
+					} else if (found && (index + 1 < fontGroupings.size())) {
 						abstBlock = fontGroupings.get(index + 1);
 						abstContent = abstBlock.getText();
 						if (!(abstContent.split(" ").length > 20)) {
 							found = false;
 							continue;
 						}
-
 						break;
 					}
-
 				}
 			}
 			titleOffSet++;
@@ -162,8 +159,7 @@ public class UOAReportChecker implements ReportChecker {
 			return null;
 		}
 
-		return abstContent;
-
+		return abstContent.trim();
 	}
 
 	@Override
@@ -198,7 +194,7 @@ public class UOAReportChecker implements ReportChecker {
 			}
 		}
 
-		return reduce(result);
+		return reduceOutput(result);
 	}
 
 	@Override
@@ -222,7 +218,7 @@ public class UOAReportChecker implements ReportChecker {
 			return null;
 		}
 
-		return reduce(returnVal);
+		return reduceOutput(returnVal);
 	}
 
 	@Override
@@ -239,22 +235,28 @@ public class UOAReportChecker implements ReportChecker {
 		StringBuilder text = new StringBuilder();
 
 		text.append(fontGroupings.get(degreeIndex).getText());
-		if (degreeIndex + 1 < fontGroupings.size()) {
-			text.append(fontGroupings.get(degreeIndex + 1).getText());
-		}
 
-		Pattern p = Pattern.compile(degree + " in(( [A-Z][a-z]+)+)");
-		Matcher m = p.matcher(reduce(text.toString()));
+		Pattern p = Pattern.compile(degree + " in(( (?!The\\b)[A-Z][a-z]+)+)");
+		Matcher m = p.matcher(singleLine(text.toString()));
 
 		if (m.find()) {
 			result = m.group(1);
+		} else {
+			if (degreeIndex + 1 < fontGroupings.size()) {
+				text.append(fontGroupings.get(degreeIndex + 1).getText());
+			}
+
+			Matcher m2 = p.matcher(singleLine(text.toString()));
+			if (m2.find()) {
+				result = m.group(1);
+			}
 		}
 
 		if (result.equals("")) {
 			return null;
 		}
 
-		return reduce(result);
+		return reduceOutput(result);
 	}
 	// =========================================================================
 	// Unimplemented
@@ -294,17 +296,25 @@ public class UOAReportChecker implements ReportChecker {
 
 	private String findCommon(ArrayList<FontGroupBlock> blocks, Pattern p) {
 		ArrayList<String> results = new ArrayList<String>();
-
 		for (FontGroupBlock f : blocks) {
 			String searchText = f.getText();
-			if (fontGroupings.contains(f) && fontGroupings.indexOf(f) + 1 < fontGroupings.size()) {
-				searchText = (searchText + " " + (fontGroupings.get(fontGroupings.indexOf(f) + 1)).getText())
-						.replaceAll("(\r?\n)+", " ").replaceAll("  ", " ");
-			}
+
 			Matcher m = p.matcher(searchText);
 
 			while (m.find()) {
 				results.add(m.group());
+			}
+			
+			if(results.size() == 0){
+				String[] split = searchText.split("(\r?\n){2,}");
+				for(String x: split){
+					searchText = x.replaceAll("\r?\n", " ").replaceAll("  ", " ");
+					m = p.matcher(searchText);
+					
+					while (m.find()){
+						results.add(m.group());
+					}
+				}
 			}
 		}
 
@@ -331,10 +341,14 @@ public class UOAReportChecker implements ReportChecker {
 		return group;
 	}
 
-	private String reduce(String value) {
+	private String reduceOutput(String value) {
 		String[] firstBlock = value.split("(\r?\n){2,}");
 		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ").trim();
 
 		return returnVal;
+	}
+
+	private String singleLine(String value) {
+		return value.replaceAll("\\s+", " ").trim();
 	}
 }
