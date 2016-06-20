@@ -17,6 +17,7 @@ public class UOAReportChecker implements ReportChecker {
 	FontGroupBlock titleFGB = new FontGroupBlock(null, 0, null, 0);
 	int titleIndex = -1;
 	int titlePage = -1;
+	int authorIndex = -1;
 
 	public UOAReportChecker(ArrayList<FontGroupBlock> fontGroupings) {
 		this.fontGroupings = fontGroupings;
@@ -75,6 +76,7 @@ public class UOAReportChecker implements ReportChecker {
 					author[0] = x;
 					// Theses can only have 1 author;
 					// do not need to keep finding names
+					this.authorIndex = i;
 					return author;
 				}
 			}
@@ -84,16 +86,13 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findSubtitle() {
-//		if (titleIndex != -1) {
-//			if (fontGroupings
-//					.get(titleIndex + 1)
-//					.getText()
-//					.matches("((?i)by)?(([A-Z])([a-z]*(')?[a-z]*(-)?)( |\\b))*")) {
-//				return "";
-//			}
-//			return fontGroupings.get(titleIndex + 1).getText().replaceAll("(\r?\n){2,}", "\r\n");
-//		}
-//
+		for (int i = this.titleIndex + 1; i < this.fontGroupings.size(); i++) {
+			String text = this.fontGroupings.get(i).getText();
+			if(i != this.authorIndex && this.fontGroupings.get(i).getPageNum() == this.titlePage){
+				text = text + Integer.toString(i);
+				return text;
+			}
+		}
 		return null;
 	}
 
