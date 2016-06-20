@@ -108,7 +108,7 @@ public class UOAReportChecker implements ReportChecker {
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
 		
 		if(nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage){
-			return subtitleText;	
+			return reduceOutput(subtitleText);	
 		}
 		
 		return null;
@@ -304,10 +304,7 @@ public class UOAReportChecker implements ReportChecker {
 
 		for (FontGroupBlock f : blocks) {
 			String searchText = f.getText();
-			if (fontGroupings.contains(f) && fontGroupings.indexOf(f) + 1 < fontGroupings.size()) {
-				searchText = (searchText + " " + (fontGroupings.get(fontGroupings.indexOf(f) + 1)).getText())
-						.replaceAll("(\r?\n)+", " ").replaceAll("  ", " ");
-			}
+
 			Matcher m = p.matcher(searchText);
 
 			while (m.find()) {
