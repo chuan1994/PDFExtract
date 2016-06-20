@@ -36,11 +36,11 @@ public class UOAReportChecker implements ReportChecker {
 
 		ms.setTitle(findTitle());
 		ms.setAuthors(findAuthor());
-		ms.setAltTitle(findSubtitle());
 		ms.setAbstractx(findAbstract());
 		ms.setSupervisors(findSupervisors());
 		ms.setDegree(findDegree());
 		ms.setDegreeDiscp(findDiscipline());
+		ms.setAltTitle(findSubtitle());
 		return ms;
 	}
 
@@ -75,7 +75,7 @@ public class UOAReportChecker implements ReportChecker {
 			String[] split = text.trim().split("(\r?\n)");
 			for (String x : split) {
 				x = x.replaceAll("\r?\n", "");
-				if (x.matches("(((?i)by )?)(([A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
+				if (x.matches("(((?i)by )?)(((Mc|Mac)?[A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
 						|| x.matches("((?i)by )(([A-Z]+('?)[A-Z]+(-| |\\b|\\.)){2,})")) {
 
 					if (x.startsWith("by") || x.startsWith("By")) {
@@ -106,8 +106,8 @@ public class UOAReportChecker implements ReportChecker {
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
+		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage) {
 
-		if (nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage) {
 			return reduceOutput(subtitleText);
 		}
 
