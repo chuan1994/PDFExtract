@@ -103,13 +103,14 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findSubtitle() {
-		for (int i = this.titleIndex + 1; i < this.fontGroupings.size() + 1; i++) {
-			String subtitleText = this.fontGroupings.get(i).getText().replaceAll("\r?\n", " ");
-			int fgPageNum = this.fontGroupings.get(i).getPageNum();
-			if(i != this.authorIndex && i != this.degreeIndex && fgPageNum == this.titlePage){
-				return subtitleText;
-			}
+		int nextIndex = this.titleIndex + 1;
+		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
+		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
+		
+		if(nextIndex != this.authorIndex && nextIndex != this.degreeIndex && fgPageNum == this.titlePage){
+			return subtitleText;	
 		}
+		
 		return null;
 	}
 
