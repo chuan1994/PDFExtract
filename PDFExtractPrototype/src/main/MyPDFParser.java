@@ -50,11 +50,10 @@ public class MyPDFParser {
 			
 			System.out.println("===========================================================");
 			UOAReportChecker checker2 = new UOAReportChecker(textGroups2);
-			MetadataStorer meta1 = new MetadataStorer();
 			addSurfaceMeta();
-			meta1 = checker2.getAllMeta(meta1);
+			meta = checker2.getAllMeta(meta);
 			System.out.println("OUTPUT:");
-			meta1.print();
+			meta.print();
 			System.out.println("===========================================================");
 			
 			
