@@ -20,81 +20,96 @@ public class MyPDFParser {
 	private File pdf;
 	private File outputFolder;
 	private PDDocument pdDoc;
-	private MetadataStorer meta= new MetadataStorer();
+	private MetadataStorer meta = new MetadataStorer();
 	private PageDimensionCalc pdCalc = new PageDimensionCalc();
 	private MyTextStripper myStripper;
-	
-	public MyPDFParser(String path, File pdf, File outputFolder){
+
+	public MyPDFParser(String path, File pdf, File outputFolder) {
 		this.path = path;
 		this.pdf = pdf;
 		this.outputFolder = outputFolder;
 		setup();
 	}
-	
-	
+
 	/**
 	 * Method to mine all metadata
 	 */
-	public void parseAll(){
-		
+	public void parseAll() {
+
 		try {
 			StringBuilder sb = new StringBuilder();
-			
-			for (int i = 1; i <= 5; i++){
+
+			for (int i = 1; i <= 5; i++) {
 				myStripper.setStartPage(i);
 				myStripper.setEndPage(i);
 				sb.append("\n" + myStripper.getText(pdDoc));
 			}
 
 			String text = sb.toString();
-			
+
 			ArrayList<FontGroupBlock> textGroups2 = splitOutcome(text);
-			
-			System.out.println("===========================================================");
+
+			System.out
+					.println("===========================================================");
 			UOAReportChecker checker2 = new UOAReportChecker(textGroups2);
 			addSurfaceMeta();
 			meta = checker2.getAllMeta(meta);
 			System.out.println("OUTPUT:");
 			meta.print(System.out);
-			System.out.println("===========================================================");
-			
-			//======================================================================================
-			//Writing to outputFile
-			String outputPath = outputFolder.getCanonicalFile() + "\\" + pdf.getName().split("\\.")[0] +".txt";
-			File f= new File(outputPath);
-			if(!f.exists()){
+			System.out
+					.println("===========================================================");
+
+			// ======================================================================================
+			// Writing to outputFile
+			String outputPath = outputFolder.getCanonicalFile() + "\\"
+					+ pdf.getName().split("\\.")[0] + ".txt";
+			if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+				outputPath = outputFolder.getCanonicalFile() + "/"
+						+ pdf.getName().split("\\.")[0] + ".txt";
+			}
+			File f = new File(outputPath);
+			if (!f.exists()) {
 				f.createNewFile();
-			}else{
+			} else {
 				int i = 0;
-				while(f.exists()){
+				while (f.exists()) {
 					i++;
-					outputPath = outputFolder.getCanonicalPath() + "\\" + pdf.getName().split("\\.")[0] + "(" + i + ")" + ".txt";
-					f = new File (outputPath);
+					outputPath = outputFolder.getCanonicalPath() + "\\"
+							+ pdf.getName().split("\\.")[0] + "(" + i + ")"
+							+ ".txt";
+
+					if (System.getProperty("os.name").toLowerCase()
+							.contains("mac")) {
+						outputPath = outputFolder.getCanonicalPath() + "/"
+								+ pdf.getName().split("\\.")[0] + "(" + i + ")"
+								+ ".txt";
+					}
+
+					f = new File(outputPath);
 				}
 				f.createNewFile();
 			}
-			
+
 			FileOutputStream fos = new FileOutputStream(f);
 			PrintStream ps = new PrintStream(fos);
 			ps.println("File: " + pdf.getAbsolutePath());
 			ps.println();
 			meta.print(ps);
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		addComplexMeta();
-	
+
 	}
 
-	public MetadataStorer getMetaData(){
+	public MetadataStorer getMetaData() {
 		return this.meta;
 	}
-	
-	
-	public void close(){
+
+	public void close() {
 		try {
 			pdDoc.close();
 		} catch (IOException e) {
@@ -102,53 +117,55 @@ public class MyPDFParser {
 			e.printStackTrace();
 		}
 	}
-	
-	public void makeTextFile(){
-		
+
+	public void makeTextFile() {
+
 	}
-	
-	
-	//=============================================================================
-	//PRIVATE METHODS
-	private void setup(){
+
+	// =============================================================================
+	// PRIVATE METHODS
+	private void setup() {
 		this.pdDoc = new PDDocument();
 		try {
 			pdDoc = pdDoc.load(pdf);
-			
+
 			myStripper = new MyTextStripper();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	private void addSurfaceMeta(){
+
+	private void addSurfaceMeta() {
 		meta.setPageLength(pdDoc.getNumberOfPages());
 		meta.setPageSize(pdCalc.getPageSize(pdDoc.getPages()));
 	}
-	
-	private void addComplexMeta(){
-		//UOAReportChecker checker = new UOAReportChecker(stripper.getFontGroups());
+
+	private void addComplexMeta() {
+		// UOAReportChecker checker = new
+		// UOAReportChecker(stripper.getFontGroups());
 	}
-	
-	private ArrayList<FontGroupBlock> splitOutcome(String text){
+
+	private ArrayList<FontGroupBlock> splitOutcome(String text) {
 		ArrayList<FontGroupBlock> fgb = new ArrayList<FontGroupBlock>();
-		Pattern pattern = Pattern.compile("(\\[.*,.*\\] )(((.+|\\s+)(?!(\\[.*,.*\\] )))*)");
-		
+		Pattern pattern = Pattern
+				.compile("(\\[.*,.*\\] )(((.+|\\s+)(?!(\\[.*,.*\\] )))*)");
+
 		Matcher matcher = pattern.matcher(text);
-		while(matcher.find()){
+		while (matcher.find()) {
 			String[] fontInfo = matcher.group(1).split(",");
 			String font = fontInfo[0].replaceAll("(\\[|\\s+)", "");
-			float size = Float.parseFloat(fontInfo[fontInfo.length - 2].replaceAll("\\s+", ""));
-			int pageNum = Integer.parseInt(fontInfo[fontInfo.length - 1].replaceAll("(\\]|\\s+)", ""));
+			float size = Float.parseFloat(fontInfo[fontInfo.length - 2]
+					.replaceAll("\\s+", ""));
+			int pageNum = Integer.parseInt(fontInfo[fontInfo.length - 1]
+					.replaceAll("(\\]|\\s+)", ""));
 			String texts = matcher.group(2);
-			
+
 			FontGroupBlock fg = new FontGroupBlock(font, size, texts, pageNum);
 			fgb.add(fg);
 		}
-		
+
 		return fgb;
 	}
-
 }

@@ -159,7 +159,7 @@ public class UOAReportChecker implements ReportChecker {
 			return null;
 		}
 
-		return abstContent.trim();
+		return removeRomanNumerals(abstContent);
 	}
 
 	@Override
@@ -350,5 +350,19 @@ public class UOAReportChecker implements ReportChecker {
 
 	private String singleLine(String value) {
 		return value.replaceAll("\\s+", " ").trim();
+	}
+	
+
+	private String removeRomanNumerals(String input){
+		String[] split = input.split("(\r?\n)");
+		StringBuilder sb = new StringBuilder();
+		for(String x : split){
+			if(x.trim().matches("(?i)(ix|iv|v?i{0,3})")){
+				continue;
+			}
+			sb.append(x + "\r\n");
+		}
+		
+		return sb.toString().trim();
 	}
 }
