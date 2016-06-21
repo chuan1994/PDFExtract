@@ -1,5 +1,7 @@
 package main;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Date;
 
 public class MetadataStorer {
@@ -132,52 +134,64 @@ public class MetadataStorer {
 	/**
 	 * Print out collected metadata;
 	 */
-	public void print() {
-		System.out.print("Title: ");
-		System.out.println(this.title);
+	public void print(PrintStream ps) {
+		ps.print("Title: ");
+		ps.println(this.title);
+		ps.println();
 
-		System.out.print("Alternative/Sub Title: ");
-		System.out.println(this.altTitle);
-
-		System.out.print("Authors: ");
+		ps.print("Alternative/Sub Title: ");
+		ps.println(this.altTitle);
+		ps.println();
+		
+		ps.print("Authors: ");
 		if(authors == null){
-			System.out.println(this.authors);
+			ps.println(this.authors);
 		}
 		else if (authors.length > 0) {
 			for (int i = 0; i < authors.length - 1; i++) {
-				System.out.print(this.authors[i] + ", ");
+				ps.print(this.authors[i] + ", ");
 			}
-			System.out.println(this.authors[authors.length - 1]);
+			ps.println(this.authors[authors.length - 1]);
 		}else{
-			System.out.println();
+			ps.println();
 		}
+		ps.println();
 
-		System.out.print("Supervisors: ");
-		System.out.println(this.supervisors);
+		ps.print("Supervisors: ");
+		ps.println(this.supervisors);
+		ps.println();
 
-		System.out.print("Degree: ");
-		System.out.println(this.degree);
+		ps.print("Degree: ");
+		ps.println(this.degree);
+		ps.println();
 
-		System.out.print("Degree Discipline: ");
-		System.out.println(this.degreeDiscp);
+		ps.print("Degree Discipline: ");
+		ps.println(this.degreeDiscp);
+		ps.println();
 
-		System.out.print("Abstract: ");
-		System.out.println(this.abstractx);
+		ps.print("Abstract: ");
+		ps.println(this.abstractx);
+		ps.println();
 
-		System.out.print("Publisher: ");
-		System.out.println(this.publisher);
+		ps.print("Publisher: ");
+		ps.println(this.publisher);
+		ps.println();
 
-		System.out.print("UUID: ");
-		System.out.println(this.UUID);
+		ps.print("UUID: ");
+		ps.println(this.UUID);
+		ps.println();
 
-		System.out.print("Publication Date: ");
-		System.out.println(this.pubDate);
+		ps.print("Publication Date: ");
+		ps.println(this.pubDate);
+		ps.println();
 
-		System.out.print("Number of Pages: ");
-		System.out.println(this.pageLength);
+		ps.print("Number of Pages: ");
+		ps.println(this.pageLength);
+		ps.println();
 
-		System.out.print("Page Size: ");
-		System.out.println(this.pageSize);
+		ps.print("Page Size: ");
+		ps.println(this.pageSize);
+		ps.println();
 	}
 	
 	
