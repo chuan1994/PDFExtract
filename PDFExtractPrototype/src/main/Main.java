@@ -24,6 +24,7 @@ public class Main {
 				MyPDFParser parser = new MyPDFParser(x, inputFiles.get(x), outputFolder);
 				parser.parseAll();
 				parser.close();
+				parser.makeTextFile();
 			}
 		}
 	}

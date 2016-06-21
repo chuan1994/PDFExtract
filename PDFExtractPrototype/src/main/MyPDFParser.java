@@ -1,7 +1,9 @@
 package main;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,9 +55,30 @@ public class MyPDFParser {
 			addSurfaceMeta();
 			meta = checker2.getAllMeta(meta);
 			System.out.println("OUTPUT:");
-			meta.print();
+			meta.print(System.out);
 			System.out.println("===========================================================");
 			
+			//======================================================================================
+			//Writing to outputFile
+			String outputPath = outputFolder.getCanonicalFile() + "\\" + pdf.getName().split("\\.")[0] +".txt";
+			File f= new File(outputPath);
+			if(!f.exists()){
+				f.createNewFile();
+			}else{
+				int i = 0;
+				while(f.exists()){
+					i++;
+					outputPath = outputFolder.getCanonicalPath() + "\\" + pdf.getName().split("\\.")[0] + "(" + i + ")" + ".txt";
+					f = new File (outputPath);
+				}
+				f.createNewFile();
+			}
+			
+			FileOutputStream fos = new FileOutputStream(f);
+			PrintStream ps = new PrintStream(fos);
+			ps.println("File: " + pdf.getAbsolutePath());
+			ps.println();
+			meta.print(ps);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -78,6 +101,10 @@ public class MyPDFParser {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public void makeTextFile(){
+		
 	}
 	
 	
