@@ -143,7 +143,25 @@ public class UOAReportChecker implements ReportChecker {
 						abstContent = blocks[1];
 					} else if (found && (index + 1 < fontGroupings.size())) {
 						abstBlock = fontGroupings.get(index + 1);
-						abstContent = abstBlock.getText();
+						StringBuilder sb = new StringBuilder();
+						sb.append(abstBlock.getText());
+						int i = 1;
+						while(fontGroupings.indexOf(abstBlock) + i < fontGroupings.size()){
+							FontGroupBlock current = fontGroupings.get(fontGroupings.indexOf(abstBlock)+i);
+							if(current.getText().trim().matches("(?i)(ix|iv|v?i{0,3})")){
+								i++;
+								continue;
+							}
+							if(!current.getFont().equalsIgnoreCase(abstBlock.getFont()) || (Math.abs(abstBlock.getFontSize() - current.getFontSize()) > 0.01f)){
+								break;
+							}
+							
+							sb.append( " " + current.getText());
+							i++;
+						}
+						
+						abstContent = sb.toString();
+						
 						if (!(abstContent.split(" ").length > 20)) {
 							found = false;
 							continue;
