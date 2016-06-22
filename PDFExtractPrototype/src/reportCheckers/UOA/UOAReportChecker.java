@@ -144,7 +144,7 @@ public class UOAReportChecker implements ReportChecker {
 					} else if (found && (index + 1 < fontGroupings.size())) {
 						abstBlock = fontGroupings.get(index + 1);
 						StringBuilder sb = new StringBuilder();
-						sb.append(abstBlock.getText());
+						sb.append(abstBlock.getText().trim());
 						int i = 1;
 						while(fontGroupings.indexOf(abstBlock) + i < fontGroupings.size()){
 							FontGroupBlock current = fontGroupings.get(fontGroupings.indexOf(abstBlock)+i);
@@ -156,7 +156,11 @@ public class UOAReportChecker implements ReportChecker {
 								break;
 							}
 							
-							sb.append( " " + current.getText());
+							if(current.getText().startsWith(System.getProperty("line.separator") + System.getProperty("line.separator"))){
+								break;
+							}
+							
+							sb.append( " " + current.getText().trim());
 							i++;
 						}
 						
