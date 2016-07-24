@@ -17,6 +17,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		getProperties();
+
 		//Parsing input pdfs
 		if(isPopulated()){
 			Set<String> keys = inputFiles.keySet();

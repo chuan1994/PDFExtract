@@ -40,7 +40,7 @@ public class MyPDFParser {
 		try {
 			StringBuilder sb = new StringBuilder();
 			
-			for (int i = 1; i <= 5; i++){
+			for (int i = 1; i <= 15; i++){
 				myStripper.setStartPage(i);
 				myStripper.setEndPage(i);
 				sb.append("\n" + myStripper.getText(pdDoc));
