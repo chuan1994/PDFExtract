@@ -75,8 +75,8 @@ public class UOAReportChecker implements ReportChecker {
 			String[] split = text.trim().split("(\r?\n)");
 			for (String x : split) {
 				x = x.replaceAll("\r?\n", "");
-				if (x.matches("(((?i)by )?)(((Mc|Mac)?[A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})")
-						|| x.matches("((?i)by )(([A-Z]+('?)[A-Z]+(-| |\\b|\\.)){2,})")) {
+				if (x.matches("(((?i)by )?)(([A-Z][a-z]+((-|')[A-Z]*[a-z]*)?( |\\. |\\b|)){2,})")
+						|| x.matches("((?i)by )(([A-Z]+((-|')[A-Z]*)?( |\\. |\\b|)){2,})")) {
 
 					if (x.startsWith("by") || x.startsWith("By")) {
 						x = x.replace("by", "");
@@ -107,8 +107,8 @@ public class UOAReportChecker implements ReportChecker {
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
 		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage) {
-
-			return reduceOutput(subtitleText);
+			if(!subtitleText.trim().equalsIgnoreCase("by"))
+				return reduceOutput(subtitleText);
 		}
 
 		return null;
@@ -227,7 +227,8 @@ public class UOAReportChecker implements ReportChecker {
 
 		ArrayList<FontGroupBlock> possibleIndexes = new ArrayList<FontGroupBlock>();
 		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
-			if (fontGroupings.get(i).getText().toLowerCase().contains("acknowledgment")) {
+			String text = fontGroupings.get(i).getText().toLowerCase();
+			if (text.contains("acknowledgement") || text.contains("acknowledgement")) {
 				if (i + 1 < fontGroupings.size())
 					possibleIndexes.add(fontGroupings.get(i + 1));
 			}
@@ -239,7 +240,7 @@ public class UOAReportChecker implements ReportChecker {
 		if (returnVal.equals("")) {
 			return null;
 		}
-
+		
 		return reduceOutput(returnVal);
 	}
 

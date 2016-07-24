@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.encryption.StandardDecryptionMaterial;
 
 import reportCheckers.UOA.UOAReportChecker;
 import helperClasses.FontGroupBlock;
