@@ -23,6 +23,7 @@ public class MyPDFParser {
 	private MetadataStorer meta= new MetadataStorer();
 	private PageDimensionCalc pdCalc = new PageDimensionCalc();
 	private MyTextStripper myStripper;
+	private OutputPrinter OP = new OutputPrinter();
 	
 	public MyPDFParser(String path, File pdf, File outputFolder){
 		this.path = path;
@@ -55,7 +56,7 @@ public class MyPDFParser {
 			addSurfaceMeta();
 			meta = checker2.getAllMeta(meta);
 			System.out.println("OUTPUT:");
-			this.printMeta(System.out, meta);
+			OP.JSONPrinter(System.out, meta);
 			System.out.println("===========================================================");
 			
 			//======================================================================================
@@ -79,7 +80,7 @@ public class MyPDFParser {
 			PrintStream ps = new PrintStream(fos);
 			ps.println("File: " + pdf.getAbsolutePath());
 			ps.println();
-			this.printMeta(ps, meta);
+			OP.simplePrinter(ps, meta);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -152,55 +153,5 @@ public class MyPDFParser {
 		return fgb;
 	}
 	
-	/**
-	 * Print out collected metadata;
-	 */
-	public void printMeta(PrintStream ps, MetadataStorer ms) {
-		ps.print("Title: ");
-		ps.println(ms.getTitle());
-		ps.println();
 
-		ps.print("Alternative/Sub Title: ");
-		ps.println(ms.getAltTitle());
-		ps.println();
-		
-		ps.print("Authors: ");
-		if(ms.getAuthors() == null){
-			ps.println(ms.getAuthors());
-		}
-		else if (ms.getAuthors().length > 0) {
-			for (int i = 0; i < ms.getAuthors().length - 1; i++) {
-				ps.print(ms.getAuthors()[i] + ", ");
-			}
-			ps.println(ms.getAuthors()[ms.getAuthors().length - 1]);
-		}else{
-			ps.println();
-		}
-		ps.println();
-
-		ps.print("Supervisors: ");
-		ps.println(ms.getSupervisors());
-		ps.println();
-
-		ps.print("Degree: ");
-		ps.println(ms.getDegree());
-		ps.println();
-
-		ps.print("Degree Discipline: ");
-		ps.println(ms.getDegreeDiscp());
-		ps.println();
-
-		ps.print("Abstract: ");
-		ps.println(ms.getAbstractx());
-		ps.println();
-
-		ps.print("Number of Pages: ");
-		ps.println(ms.getPageLength());
-		ps.println();
-
-		ps.print("Page Size: ");
-		ps.println(ms.getPageSize());
-		ps.println();
-	}
-	
 }

@@ -1,9 +1,5 @@
 package main;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.Date;
-
 public class MetadataStorer {
 	private String title;
 	private String altTitle;
