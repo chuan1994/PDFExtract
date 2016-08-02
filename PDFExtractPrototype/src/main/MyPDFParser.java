@@ -23,6 +23,7 @@ public class MyPDFParser {
 	private MetadataStorer meta= new MetadataStorer();
 	private PageDimensionCalc pdCalc = new PageDimensionCalc();
 	private MyTextStripper myStripper;
+	private OutputPrinter OP = new OutputPrinter();
 	
 	public MyPDFParser(String path, File pdf, File outputFolder){
 		this.path = path;
@@ -40,7 +41,7 @@ public class MyPDFParser {
 		try {
 			StringBuilder sb = new StringBuilder();
 			
-			for (int i = 1; i <= 5; i++){
+			for (int i = 1; i <= 15; i++){
 				myStripper.setStartPage(i);
 				myStripper.setEndPage(i);
 				sb.append("\n" + myStripper.getText(pdDoc));
@@ -55,7 +56,7 @@ public class MyPDFParser {
 			addSurfaceMeta();
 			meta = checker2.getAllMeta(meta);
 			System.out.println("OUTPUT:");
-			meta.print(System.out);
+			OP.JSONPrinter(System.out, meta);
 			System.out.println("===========================================================");
 			
 			//======================================================================================
@@ -79,7 +80,7 @@ public class MyPDFParser {
 			PrintStream ps = new PrintStream(fos);
 			ps.println("File: " + pdf.getAbsolutePath());
 			ps.println();
-			meta.print(ps);
+			OP.JSONPrinter(ps, meta);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -151,4 +152,6 @@ public class MyPDFParser {
 		
 		return fgb;
 	}
+	
+
 }

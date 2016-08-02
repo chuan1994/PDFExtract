@@ -15,10 +15,22 @@ public class MyTextStripper extends PDFTextStripper {
 	private float prevBaseFontSize = 0;
 	private StringBuilder localString = new StringBuilder();
 	private ArrayList<FontGroupBlock> fontGrouping;
+	private int currentPage = 0;
 
 	public MyTextStripper() throws IOException {
 		super();
 		fontGrouping = new ArrayList<FontGroupBlock>();
+	}
+	
+	@Override 
+	public void setStartPage(int i){
+		super.setStartPage(i);
+		currentPage = i;
+	}
+	
+	@Override
+	public int getCurrentPageNo(){
+		return this.currentPage;
 	}
 
 	@Override

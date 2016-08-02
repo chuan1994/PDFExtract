@@ -1,9 +1,5 @@
 package main;
 
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.Date;
-
 public class MetadataStorer {
 	private String title;
 	private String altTitle;
@@ -12,10 +8,6 @@ public class MetadataStorer {
 	private String degree;
 	private String degreeDiscp;
 	private String abstractx;
-	private String publisher;
-	private String UUID;
-
-	private Date pubDate;
 
 	private int pageLength;
 	private String pageSize;
@@ -86,33 +78,6 @@ public class MetadataStorer {
 	}
 
 	// =================================================
-	public String getPublisher() {
-		return publisher;
-	}
-
-	public void setPublisher(String publisher) {
-		this.publisher = publisher;
-	}
-
-	// =================================================
-	public String getUUID() {
-		return UUID;
-	}
-
-	public void setUUID(String uUID) {
-		UUID = uUID;
-	}
-
-	// =================================================
-	public Date getPubDate() {
-		return pubDate;
-	}
-
-	public void setPubDate(Date pubDate) {
-		this.pubDate = pubDate;
-	}
-
-	// =================================================
 	public int getPageLength() {
 		return pageLength;
 	}
@@ -131,68 +96,5 @@ public class MetadataStorer {
 	}
 
 	// =================================================
-	/**
-	 * Print out collected metadata;
-	 */
-	public void print(PrintStream ps) {
-		ps.print("Title: ");
-		ps.println(this.title);
-		ps.println();
-
-		ps.print("Alternative/Sub Title: ");
-		ps.println(this.altTitle);
-		ps.println();
-		
-		ps.print("Authors: ");
-		if(authors == null){
-			ps.println(this.authors);
-		}
-		else if (authors.length > 0) {
-			for (int i = 0; i < authors.length - 1; i++) {
-				ps.print(this.authors[i] + ", ");
-			}
-			ps.println(this.authors[authors.length - 1]);
-		}else{
-			ps.println();
-		}
-		ps.println();
-
-		ps.print("Supervisors: ");
-		ps.println(this.supervisors);
-		ps.println();
-
-		ps.print("Degree: ");
-		ps.println(this.degree);
-		ps.println();
-
-		ps.print("Degree Discipline: ");
-		ps.println(this.degreeDiscp);
-		ps.println();
-
-		ps.print("Abstract: ");
-		ps.println(this.abstractx);
-		ps.println();
-
-		ps.print("Publisher: ");
-		ps.println(this.publisher);
-		ps.println();
-
-		ps.print("UUID: ");
-		ps.println(this.UUID);
-		ps.println();
-
-		ps.print("Publication Date: ");
-		ps.println(this.pubDate);
-		ps.println();
-
-		ps.print("Number of Pages: ");
-		ps.println(this.pageLength);
-		ps.println();
-
-		ps.print("Page Size: ");
-		ps.println(this.pageSize);
-		ps.println();
-	}
-	
 	
 }
