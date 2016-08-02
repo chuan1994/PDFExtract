@@ -80,7 +80,7 @@ public class MyPDFParser {
 			PrintStream ps = new PrintStream(fos);
 			ps.println("File: " + pdf.getAbsolutePath());
 			ps.println();
-			OP.simplePrinter(ps, meta);
+			OP.JSONPrinter(ps, meta);
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

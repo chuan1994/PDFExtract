@@ -1,9 +1,11 @@
 package main;
 
+import java.io.IOException;
 import java.io.PrintStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 
 public class OutputPrinter {
@@ -62,8 +64,11 @@ public class OutputPrinter {
 	public void JSONPrinter(PrintStream ps, MetadataStorer ms){
 		ObjectMapper mapper = new ObjectMapper();
 			try {
+				
 				String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(ms);
-				System.out.println(output);
+				output = output.replaceAll("\\\\r?\\\\n", System.getProperty("line.separator"));
+				ps.println(output);
+
 			} catch (JsonProcessingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
