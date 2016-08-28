@@ -66,7 +66,6 @@ public class OutputPrinter {
 			try {
 				
 				String output = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(ms);
-				output = output.replaceAll("\\\\r?\\\\n", System.getProperty("line.separator"));
 				ps.println(output);
 
 			} catch (JsonProcessingException e) {

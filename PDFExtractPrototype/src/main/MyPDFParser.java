@@ -61,7 +61,7 @@ public class MyPDFParser {
 			
 			//======================================================================================
 			//Writing to outputFile
-			String outputPath = outputFolder.getCanonicalFile() + System.getProperty("file.separator") + pdf.getName().split("\\.")[0] +".txt";
+			String outputPath = outputFolder.getCanonicalFile() + File.separator + pdf.getName().split("\\.")[0] +".txt";
 			File f= new File(outputPath);
 			if(!f.exists()){
 				f.createNewFile();
@@ -69,7 +69,7 @@ public class MyPDFParser {
 				int i = 0;
 				while(f.exists()){
 					i++;
-					outputPath = outputFolder.getCanonicalPath() + System.getProperty("file.separator") + pdf.getName().split("\\.")[0] + "(" + i + ")" + ".txt";
+					outputPath = outputFolder.getCanonicalPath() + File.separator + pdf.getName().split("\\.")[0] + "(" + i + ")" + ".txt";
 
 					f = new File (outputPath);
 				}
@@ -78,8 +78,6 @@ public class MyPDFParser {
 			
 			FileOutputStream fos = new FileOutputStream(f);
 			PrintStream ps = new PrintStream(fos);
-			ps.println("File: " + pdf.getAbsolutePath());
-			ps.println();
 			OP.JSONPrinter(ps, meta);
 			
 		} catch (IOException e) {

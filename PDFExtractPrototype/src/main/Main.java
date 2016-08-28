@@ -29,6 +29,7 @@ public class Main {
 			System.out.println("1) Populate the config file. Instructions are found within");
 			System.out.println("2) Run the jar with a list of input files separated by a space followed by an output folder");
 			System.out.println("Example: java -jar PDFExtractPrototype.jar example.pdf example1.pdf example2.pdf outputFolder");
+			return;
 		}
 		
 		// Parsing input pdfs
@@ -51,7 +52,7 @@ public class Main {
 		File outTemp = new File(args[argLength -1]);
 		setOutput(outTemp);
 		
-		for(int i = 0; i < argLength-2; i++){
+		for(int i = 0; i < argLength-1; i++){
 			addInput(args[i]);
 		}
 	}
