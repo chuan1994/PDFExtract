@@ -32,6 +32,7 @@ public class PDFValidator {
 		try {
 			PDDocument pdDoc = new PDDocument();
 			pdDoc = pdDoc.load(file);
+			pdDoc.close();
 			return true;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
