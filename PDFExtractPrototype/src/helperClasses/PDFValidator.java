@@ -28,6 +28,7 @@ public class PDFValidator {
 	 * Method to read PDF to check if valid
 	 * @return
 	 */
+	
 	public boolean isPDF(){
 		try {
 			PDDocument pdDoc = new PDDocument();

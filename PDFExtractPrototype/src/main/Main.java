@@ -40,7 +40,6 @@ public class Main {
 						outputFolder);
 				parser.parseAll();
 				parser.close();
-				parser.makeTextFile();
 			}
 		}
 	}
