@@ -1,5 +1,10 @@
 package main;
 
+/**
+ * POJO to store all the metadata information of a PDF document
+ * @author chuan
+ *
+ */
 public class MetadataStorer {
 	private String title;
 	private String altTitle;

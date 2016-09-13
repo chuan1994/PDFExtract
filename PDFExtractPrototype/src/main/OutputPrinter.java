@@ -1,17 +1,20 @@
 package main;
 
-import java.io.IOException;
 import java.io.PrintStream;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 
-
+/**
+ * Class to manage where a MetadataStorer object is printed
+ * @author chuan
+ *
+ */
 public class OutputPrinter {
 
 	/**
 	 * Print out collected metadata;
+	 * Basic printer, does not print to xml or json output
 	 */
 	public void simplePrinter(PrintStream ps, MetadataStorer ms) {
 		ps.print("Title: ");
@@ -61,6 +64,12 @@ public class OutputPrinter {
 		ps.println();
 	}
 	
+	
+	/**
+	 * Prints JSON format of MetadataStorer object to the specified printstream
+	 * @param ps
+	 * @param ms
+	 */
 	public void JSONPrinter(PrintStream ps, MetadataStorer ms){
 		ObjectMapper mapper = new ObjectMapper();
 			try {

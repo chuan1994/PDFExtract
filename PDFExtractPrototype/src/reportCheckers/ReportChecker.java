@@ -4,6 +4,12 @@ import java.util.Date;
 
 import main.MetadataStorer;
 
+/**
+ * Interface with all the methods to extract the identified entities
+ * Implement to write own logic to extract entities
+ * @author chuan
+ *
+ */
 public interface ReportChecker {
 
 	public String findTitle();
