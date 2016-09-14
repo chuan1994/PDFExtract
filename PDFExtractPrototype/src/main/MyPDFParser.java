@@ -139,7 +139,7 @@ public class MyPDFParser {
 				while (f.exists()) {
 					i++;
 					outputPath = outputFolder.getCanonicalPath() + File.separator + pdf.getName().split("\\.")[0] + "("
-							+ i + ")" + ".txt";
+							+ i + ")" + ".json";
 
 					f = new File(outputPath);
 				}
