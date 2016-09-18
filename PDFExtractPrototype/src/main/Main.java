@@ -128,7 +128,7 @@ public class Main {
 	}
 	
 	/**
-	 * method to set hte output folder
+	 * method to set the output folder
 	 * @param outFolder
 	 */
 	public static void setOutput(File outFolder){
