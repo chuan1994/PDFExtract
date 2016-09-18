@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
@@ -32,14 +33,31 @@ public class Main {
 			return;
 		}
 		
-		// Parsing input pdfs
+		ArrayList<MyPDFParser> mppList = new ArrayList<MyPDFParser>();
+		
+		// Parsing input pdfs on separate threads
 		if (isPopulated()) {
 			Set<String> keys = inputFiles.keySet();
 			for (String x : keys) {
 				MyPDFParser parser = new MyPDFParser(x, inputFiles.get(x),
 						outputFolder);
-				parser.parseAll();
-				parser.close();
+				mppList.add(parser);
+				parser.execute();
+			}
+		}
+		
+		ArrayList<MyPDFParser> mppRemoveList = new ArrayList<MyPDFParser>();
+		
+		while(!mppList.isEmpty()){
+			//Remove when done
+			for(MyPDFParser mpp:mppList){
+				if(mpp.isDone()){
+					mppRemoveList.add(mpp);
+				}
+			}
+			for(MyPDFParser mpp:mppRemoveList){
+				mppList.remove(mpp);
+				mpp.close();
 			}
 		}
 	}
@@ -56,7 +74,9 @@ public class Main {
 		}
 	}
 	
-	
+	/**
+	 * method to obtain properties from config file
+	 */
 	public static void getProperties() {
 
 		Properties configProp = new Properties();
@@ -86,6 +106,11 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * method to add input into the hashmap to be processed
+	 * does input validation
+	 * @param path
+	 */
 	public static void addInput(String path){
 		File y = new File(path);
 		if (!y.isFile()) {
@@ -102,6 +127,10 @@ public class Main {
 		inputFiles.put(path, y);
 	}
 	
+	/**
+	 * method to set hte output folder
+	 * @param outFolder
+	 */
 	public static void setOutput(File outFolder){
 		if (outFolder.isFile()) {
 			return;
@@ -112,6 +141,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * checks to see if the input parameters are populated correctly
+	 * @return
+	 */
 	public static boolean isPopulated() {
 		boolean one = inputFiles.size() > 0;
 		boolean two = outputFolder != null && outputFolder.isDirectory();

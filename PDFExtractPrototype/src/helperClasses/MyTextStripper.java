@@ -9,19 +9,28 @@ import java.util.Map.Entry;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 
+/**
+ * Class is responsible for extracting the text and providing font based information
+ * It sorts the specified page ranges into different blocks of text.
+ * These blocks are oragnised by the font, font size and page numbers.
+ * @author cwu323
+ *
+ */
 public class MyTextStripper extends PDFTextStripper {
 
 	private String prevBaseFont = "";
 	private float prevBaseFontSize = 0;
 	private StringBuilder localString = new StringBuilder();
-	private ArrayList<FontGroupBlock> fontGrouping;
+	private ArrayList<FontGroup> fontGrouping;
 	private int currentPage = 0;
 
 	public MyTextStripper() throws IOException {
 		super();
-		fontGrouping = new ArrayList<FontGroupBlock>();
+		fontGrouping = new ArrayList<FontGroup>();
 	}
 	
+	//==========================================================
+	//Using own page setting methods to avoid concurrency issues
 	@Override 
 	public void setStartPage(int i){
 		super.setStartPage(i);
@@ -32,7 +41,13 @@ public class MyTextStripper extends PDFTextStripper {
 	public int getCurrentPageNo(){
 		return this.currentPage;
 	}
-
+	//==========================================================
+	
+	/**
+	 * 	Sorting the text into fontgroups. Identifies the font metadata of the current text to be written
+	 * creates a new fontgroup when the font metadata changes to create a list of text organised by 
+	 * this metadata
+	 */
 	@Override
 	public void writeString(String text, List<TextPosition> textPositions)
 			throws IOException {
@@ -65,10 +80,10 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 		else{
 			//Add previous block into a group
-			FontGroupBlock f = new FontGroupBlock(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
+			FontGroup f = new FontGroup(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
 			fontGrouping.add(f);
 			
-			//Resetting for 
+			//Resetting for next block
 			prevBaseFont = commonFont;
 			prevBaseFontSize = commonFontSize;
 			writeString("[" + commonFont + "," + commonFontSize + "," + this.getCurrentPageNo() +"] " + text );
@@ -77,12 +92,19 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 	}
 	
-	public ArrayList<FontGroupBlock> getFontGroups(){
+	/**
+	 * getter for the font groups
+	 * @return
+	 */
+	public ArrayList<FontGroup> getFontGroups(){
 		return this.fontGrouping;
 	}
 	
+	/**
+	 * method to display all the font groups so far in the console output
+	 */
 	public void print(){
-		for(FontGroupBlock f : this.fontGrouping){
+		for(FontGroup f : this.fontGrouping){
 			System.out.println("Font = " + f.getFont());
 			System.out.println("Font Size = " + f.getFontSize());
 			System.out.println("Text = " + f.getText());
