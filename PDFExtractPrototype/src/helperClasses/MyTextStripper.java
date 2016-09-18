@@ -9,6 +9,13 @@ import java.util.Map.Entry;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.text.TextPosition;
 
+/**
+ * Class is responsible for extracting the text and providing font based information
+ * It sorts the specified page ranges into different blocks of text.
+ * These blocks are oragnised by the font, font size and page numbers.
+ * @author cwu323
+ *
+ */
 public class MyTextStripper extends PDFTextStripper {
 
 	private String prevBaseFont = "";
@@ -22,6 +29,8 @@ public class MyTextStripper extends PDFTextStripper {
 		fontGrouping = new ArrayList<FontGroup>();
 	}
 	
+	//==========================================================
+	//Using own page setting methods to avoid concurrency issues
 	@Override 
 	public void setStartPage(int i){
 		super.setStartPage(i);
@@ -32,7 +41,13 @@ public class MyTextStripper extends PDFTextStripper {
 	public int getCurrentPageNo(){
 		return this.currentPage;
 	}
-
+	//==========================================================
+	
+	/**
+	 * 	Sorting the text into fontgroups. Identifies the font metadata of the current text to be written
+	 * creates a new fontgroup when the font metadata changes to create a list of text organised by 
+	 * this metadata
+	 */
 	@Override
 	public void writeString(String text, List<TextPosition> textPositions)
 			throws IOException {
@@ -68,7 +83,7 @@ public class MyTextStripper extends PDFTextStripper {
 			FontGroup f = new FontGroup(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
 			fontGrouping.add(f);
 			
-			//Resetting for 
+			//Resetting for next block
 			prevBaseFont = commonFont;
 			prevBaseFontSize = commonFontSize;
 			writeString("[" + commonFont + "," + commonFontSize + "," + this.getCurrentPageNo() +"] " + text );
@@ -77,10 +92,17 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 	}
 	
+	/**
+	 * getter for the font groups
+	 * @return
+	 */
 	public ArrayList<FontGroup> getFontGroups(){
 		return this.fontGrouping;
 	}
 	
+	/**
+	 * method to display all the font groups so far in the console output
+	 */
 	public void print(){
 		for(FontGroup f : this.fontGrouping){
 			System.out.println("Font = " + f.getFont());
