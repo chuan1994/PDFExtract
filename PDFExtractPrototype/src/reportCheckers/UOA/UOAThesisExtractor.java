@@ -79,7 +79,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
-		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage && subtitleText.split(" ").length > 1) {
+		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage && subtitleText.split(" ").length > 3) {
 			return reduceOutput(subtitleText);
 		}
 		
