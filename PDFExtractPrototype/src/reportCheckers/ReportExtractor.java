@@ -10,7 +10,7 @@ import main.MetadataStorer;
  * @author chuan
  *
  */
-public interface ReportChecker {
+public interface ReportExtractor {
 
 	public String findTitle();
 	public String findSubtitle();
