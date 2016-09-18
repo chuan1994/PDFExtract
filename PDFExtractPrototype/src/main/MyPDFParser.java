@@ -73,7 +73,6 @@ public class MyPDFParser extends SwingWorker<Void, Void> {
 			}
 
 			String text = sb.toString();
-			System.out.println(text);
 			//Parsing information and extracting using reportCheckers
 			ArrayList<FontGroup> textGroups2 = splitOutcome(text);
 			ReportExtractor checker = new UOAThesisExtractor(textGroups2);
