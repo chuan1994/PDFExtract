@@ -37,10 +37,11 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 		ms.setTitle(findTitle());
 		ms.setAuthors(findAuthor());
+		ms.setDegree(findDegree());
+		ms.setDegreeDiscp(findDiscipline());
 		// ms.setAbstractx(findAbstract());
 		// ms.setSupervisors(findSupervisors());
-		 ms.setDegree(findDegree());
-		 ms.setDegreeDiscp(findDiscipline());
+		 
 		// ms.setAltTitle(findSubtitle());
 		return ms;
 	}
@@ -123,9 +124,6 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 					returnVal = new String[1];
 					returnVal[0] = reduceOutput(x);
-
-					System.out.println(returnVal[0]);
-
 					// Theses can only have 1 author;
 					// do not need to keep finding names
 					this.authorIndex = i;
@@ -173,8 +171,38 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 	@Override
 	public String findDiscipline() {
-		// TODO Auto-generated method stub
-		return null;
+		//Check what comes after the degree specified, obtain discipline from that using regex
+		if (degreeIndex == -1) {
+			return null;
+		}
+		
+		String returnVal = null;
+		
+		String degree = ms.getDegree();
+		StringBuilder text = new StringBuilder();
+		
+		text.append(fontGroupings.get(degreeIndex).getText());
+		Pattern p = Pattern.compile(degree + " in(( (?!The\\b)[A-Z][a-z]+)+)");
+		Matcher m = p.matcher(singleLine(text.toString()));
+
+		if (m.find()) {
+			returnVal = m.group(1);
+		} else {
+			if (degreeIndex + 1 < fontGroupings.size()) {
+				text.append(fontGroupings.get(degreeIndex + 1).getText());
+			}
+
+			Matcher m2 = p.matcher(singleLine(text.toString()));
+			if (m2.find()) {
+				returnVal = m.group(1);
+			}
+		}
+
+		if (returnVal == null||returnVal.equals("")) {
+			return null;
+		}
+
+		return reduceOutput(returnVal);
 	}
 
 	@Override
@@ -281,6 +309,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 	 */
 
 	private String reduceOutput(String value) {
+		
 		String[] firstBlock = value.split("(\r?\n){2,}");
 		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ").trim();
 
