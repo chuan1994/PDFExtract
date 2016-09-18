@@ -82,10 +82,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage && subtitleText.split(" ").length > 3) {
 			return reduceOutput(subtitleText);
 		}
-		
-		
-		
-		
+
 		return returnVal;
 	}
 
