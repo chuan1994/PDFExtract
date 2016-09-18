@@ -20,11 +20,12 @@ public class UOAThesisExtractor implements ReportExtractor {
 	FontGroup titleFGB = new FontGroup(null, 0, null, 0);
 
 	// Indexes and pages required as dependencies for other entities
-	int titleIndex = -1;
-	int titlePage = -1;
-	int authorIndex = -1;
-	int degreeIndex = -1;
-
+	private int titleIndex = -1;
+	private int titlePage = -1;
+	private int authorIndex = -1;
+	private int degreeIndex = -1;
+	private int supervisorMarker = -1;
+	
 	public UOAThesisExtractor(ArrayList<FontGroup> fontGroupings) {
 		this.fontGroupings = fontGroupings;
 	}
@@ -39,10 +40,11 @@ public class UOAThesisExtractor implements ReportExtractor {
 		ms.setAuthors(findAuthor());
 		ms.setDegree(findDegree());
 		ms.setDegreeDiscp(findDiscipline());
-		// ms.setAbstractx(findAbstract());
+		ms.setAbstractx(findAbstract());
+		  
 		// ms.setSupervisors(findSupervisors());
 		 
-		 ms.setAltTitle(findSubtitle());
+		ms.setAltTitle(findSubtitle());
 		return ms;
 	}
 
@@ -101,8 +103,8 @@ public class UOAThesisExtractor implements ReportExtractor {
 		ArrayList<FontGroup> finalGroups = new ArrayList<FontGroup>();
 		// reducing list to only search before supervisors are specified
 		for (FontGroup fg : coverPage) {
-			String text = fg.getText().replaceAll("[^a-zA-Z0-9 -]", "");
-			if (text.matches("(.*((?i)supervisor).*)")) {
+			if (fg.getText().toLowerCase().contains("supervisor")) {
+				supervisorMarker = fontGroupings.indexOf(fg);
 				break;
 			}
 			if (fontGroupings.indexOf(fg) > titleIndex) {
@@ -228,28 +230,78 @@ public class UOAThesisExtractor implements ReportExtractor {
 		int titleOffset = 1;
 		boolean found = false;
 		
+		ArrayList<FontGroup> abstractContent = new ArrayList<FontGroup>();
+
 		while(!found){
-			if(titleOffset + titlePage == 15){
+			if((titleOffset + titlePage) == 15){
 				found = true;
 				titleOffset++;
 				continue;
 			}
 			
+			//Locating the abstract header
 			ArrayList<FontGroup> pageBlock = getBlocksInPage(titlePage + titleOffset);
-			if(!getLargestFontText(pageBlock).getText().toLowerCase().contains("abstract")){
+			if(pageBlock.size()== 0){
+				titleOffset++;
+				continue;
+			} 
+			
+			FontGroup largest = getLargestFontText(pageBlock);
+			if(!largest.getText().toLowerCase().contains("abstract")){
 				titleOffset++;
 				continue;
 			}
 			
+			int startPos = pageBlock.indexOf(largest);
+			found = true;
 			
-			//=======FINISH THIS
+			//get all content on page after abstract header
+			for(int i = startPos + 1; i<pageBlock.size(); i++){
+				if(pageBlock.get(i).getText().trim().matches("(?i)((ix|iv|v?i{0,3})|(page( |-)([0-9])*))")){
+					continue;
+				}
+				abstractContent.add(pageBlock.get(i));
+			}
+			
+			float referenceFontSize = abstractContent.get(abstractContent.size() -1).getFontSize();
+			
+			//get all content on pages after until header is reached or 15 page limit reached
+			titleOffset++;
+			int endPos = -1;
+			while(!((titleOffset + titlePage) == 15) && endPos == -1){
+				
+				pageBlock = getBlocksInPage(titlePage + titleOffset);
+				if(pageBlock.size()== 0){
+					titleOffset++;
+					continue;
+				} 
+				
+				largest = getLargestFontText(pageBlock);
+				if(largest.getFontSize() - referenceFontSize > -0.5f){
+					endPos = pageBlock.indexOf(largest);
+				}
+				
+				for(int i = 0; i < pageBlock.size(); i++){
+					if (i == endPos){
+						break;
+					}
+					if(pageBlock.get(i).getText().trim().matches("(?i)((ix|iv|v?i{0,3})|(page( |-)([0-9])*))")){
+						continue;
+					}
+					abstractContent.add(pageBlock.get(i));
+				}
+				
+				titleOffset++;
+			}
 		}
 		
+		StringBuilder sb = new StringBuilder();
+		for(FontGroup fg:abstractContent){
+			sb.append(fg.getText().trim() + "\n ");
+		}
 		
-		
-		
-		
-		
+		System.out.println(ms.getTitle());
+		returnVal = removePageNumbers(sb.toString());
 		
 		return returnVal;
 	}
@@ -273,7 +325,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 	}
 
 	/**
-	 * Returns the fontgroup with teh larget font size from a list
+	 * Returns the fontgroup with the largest font size from a list
 	 * 
 	 * @param group
 	 * @return
