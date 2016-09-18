@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.*;
 
 import reportCheckers.UOA.UOAReportChecker;
-import helperClasses.FontGroupBlock;
+import helperClasses.FontGroup;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
 
@@ -59,7 +59,7 @@ public class MyPDFParser {
 			String text = sb.toString();
 
 			//Parsing information and extracting using reportCheckers
-			ArrayList<FontGroupBlock> textGroups2 = splitOutcome(text);
+			ArrayList<FontGroup> textGroups2 = splitOutcome(text);
 			UOAReportChecker checker2 = new UOAReportChecker(textGroups2);
 			addSurfaceMeta();
 			meta = checker2.getAllMeta(meta);
@@ -162,8 +162,8 @@ public class MyPDFParser {
 	 * @param text
 	 * @return
 	 */
-	private ArrayList<FontGroupBlock> splitOutcome(String text) {
-		ArrayList<FontGroupBlock> fgb = new ArrayList<FontGroupBlock>();
+	private ArrayList<FontGroup> splitOutcome(String text) {
+		ArrayList<FontGroup> fgb = new ArrayList<FontGroup>();
 		Pattern pattern = Pattern.compile("(\\[.*,.*\\] )(((.+|\\s+)(?!(\\[.*,.*\\] )))*)");
 
 		Matcher matcher = pattern.matcher(text);
@@ -174,7 +174,7 @@ public class MyPDFParser {
 			int pageNum = Integer.parseInt(fontInfo[fontInfo.length - 1].replaceAll("(\\]|\\s+)", ""));
 			String texts = matcher.group(2);
 
-			FontGroupBlock fg = new FontGroupBlock(font, size, texts, pageNum);
+			FontGroup fg = new FontGroup(font, size, texts, pageNum);
 			fgb.add(fg);
 		}
 

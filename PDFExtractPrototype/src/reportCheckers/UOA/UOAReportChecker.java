@@ -9,22 +9,22 @@ import java.util.stream.Collectors;
 
 import reportCheckers.ReportChecker;
 import main.MetadataStorer;
-import helperClasses.FontGroupBlock;
+import helperClasses.FontGroup;
 
 public class UOAReportChecker implements ReportChecker {
 
 	MetadataStorer ms;
 
-	ArrayList<FontGroupBlock> fontGroupings = new ArrayList<FontGroupBlock>();
+	ArrayList<FontGroup> fontGroupings = new ArrayList<FontGroup>();
 
-	FontGroupBlock titleFGB = new FontGroupBlock(null, 0, null, 0);
+	FontGroup titleFGB = new FontGroup(null, 0, null, 0);
 
 	int titleIndex = -1;
 	int titlePage = -1;
 	int authorIndex = -1;
 	int degreeIndex = -1;
 
-	public UOAReportChecker(ArrayList<FontGroupBlock> fontGroupings) {
+	public UOAReportChecker(ArrayList<FontGroup> fontGroupings) {
 		this.fontGroupings = fontGroupings;
 	}
 
@@ -47,17 +47,17 @@ public class UOAReportChecker implements ReportChecker {
 	@Override
 	public String findTitle() {
 		String title = "";
-		ArrayList<FontGroupBlock> temp = getPageBlocks(2);
+		ArrayList<FontGroup> temp = getPageBlocks(2);
 		StringBuilder contents = new StringBuilder();
 
-		for (FontGroupBlock f : temp) {
+		for (FontGroup f : temp) {
 			contents.append(f.getText() + " ");
 		}
 
 		if (contents.toString().split(" ").length < 8) {
 			temp = getPageBlocks(3);
 		}
-		FontGroupBlock titleBlock = maxFontSizeBlock(temp);
+		FontGroup titleBlock = maxFontSizeBlock(temp);
 
 		titleIndex = fontGroupings.indexOf(titleBlock);
 		titlePage = titleBlock.getPageNum();
@@ -116,7 +116,7 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findAbstract() {
-		FontGroupBlock abstBlock = null;
+		FontGroup abstBlock = null;
 		String abst;
 		String abstContent = "";
 		int titleOffSet = 1;
@@ -127,9 +127,9 @@ public class UOAReportChecker implements ReportChecker {
 				found = true;
 				break;
 			}
-			ArrayList<FontGroupBlock> pageBlock = getPageBlocks(titlePage + titleOffSet);
-			for (FontGroupBlock f : pageBlock) {
-				FontGroupBlock abstTitle;
+			ArrayList<FontGroup> pageBlock = getPageBlocks(titlePage + titleOffSet);
+			for (FontGroup f : pageBlock) {
+				FontGroup abstTitle;
 
 				abst = f.getText();
 				if (abst.toLowerCase().contains("abstract")) {
@@ -147,7 +147,7 @@ public class UOAReportChecker implements ReportChecker {
 						sb.append(abstBlock.getText().trim());
 						int i = 1;
 						while(fontGroupings.indexOf(abstBlock) + i < fontGroupings.size()){
-							FontGroupBlock current = fontGroupings.get(fontGroupings.indexOf(abstBlock)+i);
+							FontGroup current = fontGroupings.get(fontGroupings.indexOf(abstBlock)+i);
 							if(current.getText().trim().matches("(?i)(ix|iv|v?i{0,3})")){
 								i++;
 								continue;
@@ -187,7 +187,7 @@ public class UOAReportChecker implements ReportChecker {
 	@Override
 	public String findDegree() {
 
-		ArrayList<FontGroupBlock> searchBlocks = new ArrayList<FontGroupBlock>();
+		ArrayList<FontGroup> searchBlocks = new ArrayList<FontGroup>();
 
 		// Find appropriate blocks to search through
 		if (titlePage != -1 && titleIndex != -1) {
@@ -208,7 +208,7 @@ public class UOAReportChecker implements ReportChecker {
 			return null;
 		}
 
-		for (FontGroupBlock f : searchBlocks) {
+		for (FontGroup f : searchBlocks) {
 			String text = f.getText().replaceAll("\r?\n", " ").replaceAll("  ", " ");
 			if (text.contains(result)) {
 				degreeIndex = fontGroupings.indexOf(f);
@@ -225,7 +225,7 @@ public class UOAReportChecker implements ReportChecker {
 		Pattern p = Pattern.compile(
 				"(supervisor(s?), )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+)((and |, )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+))*");
 
-		ArrayList<FontGroupBlock> possibleIndexes = new ArrayList<FontGroupBlock>();
+		ArrayList<FontGroup> possibleIndexes = new ArrayList<FontGroup>();
 		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
 			if (fontGroupings.get(i).getText().toLowerCase().contains("acknowledgment")) {
 				if (i + 1 < fontGroupings.size())
@@ -303,11 +303,11 @@ public class UOAReportChecker implements ReportChecker {
 
 	// =========================================================================
 	// Private helper methods
-	private FontGroupBlock maxFontSizeBlock(ArrayList<FontGroupBlock> group) {
+	private FontGroup maxFontSizeBlock(ArrayList<FontGroup> group) {
 		float maxFontSize = 0;
-		FontGroupBlock returnVal = group.get(0);
+		FontGroup returnVal = group.get(0);
 
-		for (FontGroupBlock fg : group) {
+		for (FontGroup fg : group) {
 			if (fg.getFontSize() > maxFontSize) {
 				maxFontSize = fg.getFontSize();
 				returnVal = fg;
@@ -316,9 +316,9 @@ public class UOAReportChecker implements ReportChecker {
 		return returnVal;
 	}
 
-	private String findCommon(ArrayList<FontGroupBlock> blocks, Pattern p) {
+	private String findCommon(ArrayList<FontGroup> blocks, Pattern p) {
 		ArrayList<String> results = new ArrayList<String>();
-		for (FontGroupBlock f : blocks) {
+		for (FontGroup f : blocks) {
 			String searchText = f.getText();
 
 			Matcher m = p.matcher(searchText);
@@ -353,9 +353,9 @@ public class UOAReportChecker implements ReportChecker {
 		return result;
 	}
 
-	private ArrayList<FontGroupBlock> getPageBlocks(int pageNumber) {
-		ArrayList<FontGroupBlock> group = new ArrayList<FontGroupBlock>();
-		for (FontGroupBlock block : fontGroupings) {
+	private ArrayList<FontGroup> getPageBlocks(int pageNumber) {
+		ArrayList<FontGroup> group = new ArrayList<FontGroup>();
+		for (FontGroup block : fontGroupings) {
 			if (block.getPageNum() == pageNumber) {
 				group.add(block);
 			}

@@ -14,12 +14,12 @@ public class MyTextStripper extends PDFTextStripper {
 	private String prevBaseFont = "";
 	private float prevBaseFontSize = 0;
 	private StringBuilder localString = new StringBuilder();
-	private ArrayList<FontGroupBlock> fontGrouping;
+	private ArrayList<FontGroup> fontGrouping;
 	private int currentPage = 0;
 
 	public MyTextStripper() throws IOException {
 		super();
-		fontGrouping = new ArrayList<FontGroupBlock>();
+		fontGrouping = new ArrayList<FontGroup>();
 	}
 	
 	@Override 
@@ -65,7 +65,7 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 		else{
 			//Add previous block into a group
-			FontGroupBlock f = new FontGroupBlock(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
+			FontGroup f = new FontGroup(prevBaseFont, prevBaseFontSize, localString.toString(), this.getCurrentPageNo());
 			fontGrouping.add(f);
 			
 			//Resetting for 
@@ -77,12 +77,12 @@ public class MyTextStripper extends PDFTextStripper {
 		}
 	}
 	
-	public ArrayList<FontGroupBlock> getFontGroups(){
+	public ArrayList<FontGroup> getFontGroups(){
 		return this.fontGrouping;
 	}
 	
 	public void print(){
-		for(FontGroupBlock f : this.fontGrouping){
+		for(FontGroup f : this.fontGrouping){
 			System.out.println("Font = " + f.getFont());
 			System.out.println("Font Size = " + f.getFontSize());
 			System.out.println("Text = " + f.getText());
