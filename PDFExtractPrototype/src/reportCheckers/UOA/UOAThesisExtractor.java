@@ -75,6 +75,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 	@Override
 	public String findSubtitle() {
 		//Obtain string right after title. This is subtitle, provided it is not the author and degree
+		//Must be 4 words or longer
 		String returnVal = null;
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
@@ -215,14 +216,42 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 	@Override
 	public String findSupervisors() {
-		// TODO Auto-generated method stub
+
+		
 		return null;
 	}
 
 	@Override
 	public String findAbstract() {
-		// TODO Auto-generated method stub
-		return null;
+		String returnVal = null;
+		
+		int titleOffset = 1;
+		boolean found = false;
+		
+		while(!found){
+			if(titleOffset + titlePage == 15){
+				found = true;
+				titleOffset++;
+				continue;
+			}
+			
+			ArrayList<FontGroup> pageBlock = getBlocksInPage(titlePage + titleOffset);
+			if(!getLargestFontText(pageBlock).getText().toLowerCase().contains("abstract")){
+				titleOffset++;
+				continue;
+			}
+			
+			
+			//=======FINISH THIS
+		}
+		
+		
+		
+		
+		
+		
+		
+		return returnVal;
 	}
 
 	// ==================================================================================================================================
