@@ -56,7 +56,9 @@ public class Main {
 		}
 	}
 	
-	
+	/**
+	 * method to obtain properties from config file
+	 */
 	public static void getProperties() {
 
 		Properties configProp = new Properties();
@@ -86,6 +88,11 @@ public class Main {
 		}
 	}
 	
+	/**
+	 * method to add input into the hashmap to be processed
+	 * does input validation
+	 * @param path
+	 */
 	public static void addInput(String path){
 		File y = new File(path);
 		if (!y.isFile()) {
@@ -102,6 +109,10 @@ public class Main {
 		inputFiles.put(path, y);
 	}
 	
+	/**
+	 * method to set hte output folder
+	 * @param outFolder
+	 */
 	public static void setOutput(File outFolder){
 		if (outFolder.isFile()) {
 			return;
@@ -112,6 +123,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * checks to see if the input parameters are populated correctly
+	 * @return
+	 */
 	public static boolean isPopulated() {
 		boolean one = inputFiles.size() > 0;
 		boolean two = outputFolder != null && outputFolder.isDirectory();
