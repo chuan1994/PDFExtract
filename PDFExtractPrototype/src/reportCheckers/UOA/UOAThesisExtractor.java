@@ -277,7 +277,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 				} 
 				
 				largest = getLargestFontText(pageBlock);
-				if(largest.getFontSize() - referenceFontSize > -0.5f){
+				if( (referenceFontSize - largest.getFontSize()) < -0.5f){
 					endPos = pageBlock.indexOf(largest);
 				}
 				
