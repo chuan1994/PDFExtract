@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.SwingWorker;
+
 import org.apache.pdfbox.pdmodel.*;
 
 import reportCheckers.UOA.UOAReportChecker;
@@ -15,7 +17,7 @@ import helperClasses.FontGroup;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
 
-public class MyPDFParser {
+public class MyPDFParser extends SwingWorker<Void, Void> {
 	private String path;
 	private File pdf;
 	private File outputFolder;
@@ -31,7 +33,13 @@ public class MyPDFParser {
 		this.outputFolder = outputFolder;
 		setup();
 	}
-
+	
+	@Override
+	protected Void doInBackground() throws Exception {
+		parseAll();
+		return null;
+	}
+	
 	/**
 	 * Returns the metadataStorer in its current state.
 	 * 
