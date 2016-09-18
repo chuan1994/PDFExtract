@@ -25,7 +25,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 	private int authorIndex = -1;
 	private int degreeIndex = -1;
 	private int supervisorMarker = -1;
-	
+
 	public UOAThesisExtractor(ArrayList<FontGroup> fontGroupings) {
 		this.fontGroupings = fontGroupings;
 	}
@@ -41,9 +41,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 		ms.setDegree(findDegree());
 		ms.setDegreeDiscp(findDiscipline());
 		ms.setAbstractx(findAbstract());
-		  
-		// ms.setSupervisors(findSupervisors());
-		 
+		ms.setSupervisors(findSupervisors());
 		ms.setAltTitle(findSubtitle());
 		return ms;
 	}
@@ -76,13 +74,17 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 	@Override
 	public String findSubtitle() {
-		//Obtain string right after title. This is subtitle, provided it is not the author and degree
-		//Must be 4 words or longer
+		// Obtain string right after title. This is subtitle, provided it is not
+		// the author and degree
+		// Must be 4 words or longer
 		String returnVal = null;
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
-		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
-		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage && subtitleText.split(" ").length > 3) {
+		String subtitleText = this.fontGroupings.get(nextIndex).getText()
+				.replaceAll("\r?\n", " ");
+		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex
+				&& fgPageNum == this.titlePage
+				&& subtitleText.split(" ").length > 3) {
 			return reduceOutput(subtitleText);
 		}
 
@@ -103,7 +105,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 		ArrayList<FontGroup> finalGroups = new ArrayList<FontGroup>();
 		// reducing list to only search before supervisors are specified
 		for (FontGroup fg : coverPage) {
-			if (fg.getText().toLowerCase().contains("supervisor")) {
+			if (fg.getText().toLowerCase().contains("supervis")) {
 				supervisorMarker = fontGroupings.indexOf(fg);
 				break;
 			}
@@ -149,20 +151,22 @@ public class UOAThesisExtractor implements ReportExtractor {
 	public String findDegree() {
 		String returnVal = null;
 		ArrayList<FontGroup> searchArea = new ArrayList<FontGroup>();
-		
+
 		// Find appropriate blocks to search through
 		if (titlePage != -1 && titleIndex != -1) {
 			int index = titleIndex;
-			while (fontGroupings.size() > index && fontGroupings.get(index).getPageNum() == titlePage) {
+			while (fontGroupings.size() > index
+					&& fontGroupings.get(index).getPageNum() == titlePage) {
 				searchArea.add(fontGroupings.get(index));
 				index++;
 			}
-		}
-		else{
+		} else {
 			searchArea = fontGroupings;
 		}
 
-		returnVal = findCommon(searchArea, Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
+		returnVal = findCommon(
+				searchArea,
+				Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
 
 		if (returnVal.equals("")) {
 			degreeIndex = -1;
@@ -170,28 +174,30 @@ public class UOAThesisExtractor implements ReportExtractor {
 		}
 
 		for (FontGroup f : searchArea) {
-			String text = f.getText().replaceAll("\r?\n", " ").replaceAll("  ", " ");
+			String text = f.getText().replaceAll("\r?\n", " ")
+					.replaceAll("  ", " ");
 			if (text.contains(returnVal)) {
 				degreeIndex = fontGroupings.indexOf(f);
 				break;
 			}
 		}
-		
+
 		return reduceOutput(returnVal);
 	}
 
 	@Override
 	public String findDiscipline() {
-		//Check what comes after the degree specified, obtain discipline from that using regex
+		// Check what comes after the degree specified, obtain discipline from
+		// that using regex
 		if (degreeIndex == -1) {
 			return null;
 		}
-		
+
 		String returnVal = null;
-		
+
 		String degree = ms.getDegree();
 		StringBuilder text = new StringBuilder();
-		
+
 		text.append(fontGroupings.get(degreeIndex).getText());
 		Pattern p = Pattern.compile(degree + " in(( (?!The\\b)[A-Z][a-z]+)+)");
 		Matcher m = p.matcher(singleLine(text.toString()));
@@ -209,7 +215,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 			}
 		}
 
-		if (returnVal == null||returnVal.equals("")) {
+		if (returnVal == null || returnVal.equals("")) {
 			return null;
 		}
 
@@ -218,91 +224,177 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 	@Override
 	public String findSupervisors() {
+		// if supervisor found in cover page, search coverpage
+		boolean found = false;
+		String returnVal = null;
+		// Search on title page if marker awas found
+		if (supervisorMarker != -1) {
+			ArrayList<FontGroup> searchBlocks = new ArrayList<FontGroup>();
+			StringBuilder sb = new StringBuilder();
+			for(int i = supervisorMarker; i < degreeIndex; i++){
+				searchBlocks.add(fontGroupings.get(i));
+				sb.append(fontGroupings.get(i).getText() + " ");
+			}
+			
+			//Assume Max 2 supervisors
+			String searchText = sb.toString().trim().replaceAll("  ", " ");
 
-		
-		return null;
+			Pattern p = Pattern.compile("(((Mc|Mac)?[A-Z][a-z]*('?)[a-z]+(-| |\\b|\\.)){2,})");
+			String[] split = searchText.split("\r?\n");
+			
+			String first = "";
+			String second = "";
+			
+			for(String x: split){
+				Matcher m = p.matcher(x);
+				
+				while(m.find()){
+					if(m.group().toLowerCase().contains("the") | m.group().toLowerCase().contains("university") | m.group().toLowerCase().contains("department") | m.group().toLowerCase().contains("zealand")){
+						continue;
+					}
+					
+					if(first.equals("")){
+						first = m.group();
+					}
+					else if (second.equals("")){
+						second = m.group();
+					}
+					else{
+						break;
+					}
+				}
+				
+				if(!(second.equals(""))){
+					returnVal = first + " and " + second;
+					return reduceOutput(returnVal);
+				}
+			}
+			returnVal = first;
+			return reduceOutput(returnVal);
+		}
+
+		// searching in acknowledgements
+		// Assumes acknowledgement is 1 page max
+		if (!found) {
+
+			int ackPageNumber = -1;
+			Pattern p = Pattern
+					.compile("(supervisor(s?), )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+)((and |, )(([A-Z]([a-z]*)('?)([a-z]+)((-| |\\. )|\\b))+))*(\\.|,)");
+
+			// finding acknowledgement page
+			ArrayList<FontGroup> page = new ArrayList<FontGroup>();
+			for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
+				if (fontGroupings.get(i).getText().toLowerCase()
+						.contains("acknowledgment")) {
+					ackPageNumber = fontGroupings.get(i).getPageNum();
+				}
+			}
+
+			if (ackPageNumber == -1) {
+				return null;
+			}
+
+			ArrayList<FontGroup> ackPage = getBlocksInPage(ackPageNumber);
+
+			returnVal = findCommon(ackPage, p);
+			returnVal = returnVal.replaceAll("(?i)supervisor(s?), ", "")
+					.replaceAll(" (?!\\b)", "");
+
+			if (returnVal.equals("")) {
+				return null;
+			}
+		}
+		return reduceOutput(returnVal);
 	}
 
 	@Override
 	public String findAbstract() {
 		String returnVal = null;
-		
+
 		int titleOffset = 1;
 		boolean found = false;
-		
+
 		ArrayList<FontGroup> abstractContent = new ArrayList<FontGroup>();
 
-		while(!found){
-			if((titleOffset + titlePage) == 15){
+		while (!found) {
+			if ((titleOffset + titlePage) == 15) {
 				found = true;
 				titleOffset++;
 				continue;
 			}
-			
-			//Locating the abstract header
-			ArrayList<FontGroup> pageBlock = getBlocksInPage(titlePage + titleOffset);
-			if(pageBlock.size()== 0){
-				titleOffset++;
-				continue;
-			} 
-			
-			FontGroup largest = getLargestFontText(pageBlock);
-			if(!largest.getText().toLowerCase().contains("abstract")){
+
+			// Locating the abstract header
+			ArrayList<FontGroup> pageBlock = getBlocksInPage(titlePage
+					+ titleOffset);
+			if (pageBlock.size() == 0) {
 				titleOffset++;
 				continue;
 			}
-			
+
+			FontGroup largest = getLargestFontText(pageBlock);
+			if (!largest.getText().toLowerCase().contains("abstract")) {
+				titleOffset++;
+				continue;
+			}
+
 			int startPos = pageBlock.indexOf(largest);
 			found = true;
-			
-			//get all content on page after abstract header
-			for(int i = startPos + 1; i<pageBlock.size(); i++){
-				if(pageBlock.get(i).getText().trim().matches("(?i)((ix|iv|v?i{0,3})|(page( |-)([0-9])*))")){
+
+			// get all content on page after abstract header
+			for (int i = startPos + 1; i < pageBlock.size(); i++) {
+				if (pageBlock.get(i).getText().trim()
+						.matches("(?i)((ix|iv|v?i{0,3})|(page( |-)([0-9])*))")) {
 					continue;
 				}
 				abstractContent.add(pageBlock.get(i));
 			}
-			
-			float referenceFontSize = abstractContent.get(abstractContent.size() -1).getFontSize();
-			
-			//get all content on pages after until header is reached or 15 page limit reached
+
+			float referenceFontSize = abstractContent.get(
+					abstractContent.size() - 1).getFontSize();
+
+			// get all content on pages after until header is reached or 15 page
+			// limit reached
 			titleOffset++;
 			int endPos = -1;
-			while(!((titleOffset + titlePage) == 15) && endPos == -1){
-				
+			while (!((titleOffset + titlePage) == 15) && endPos == -1) {
+
 				pageBlock = getBlocksInPage(titlePage + titleOffset);
-				if(pageBlock.size()== 0){
+				if (pageBlock.size() == 0) {
 					titleOffset++;
 					continue;
-				} 
-				
+				}
+
 				largest = getLargestFontText(pageBlock);
-				if( (referenceFontSize - largest.getFontSize()) < -0.5f){
+				if ((referenceFontSize - largest.getFontSize()) < -0.5f) {
 					endPos = pageBlock.indexOf(largest);
 				}
-				
-				for(int i = 0; i < pageBlock.size(); i++){
-					if (i == endPos){
+
+				for (int i = 0; i < pageBlock.size(); i++) {
+					if (i == endPos) {
 						break;
 					}
-					if(pageBlock.get(i).getText().trim().matches("(?i)((ix|iv|v?i{0,3})|(page( |-)([0-9])*))")){
+					if (pageBlock
+							.get(i)
+							.getText()
+							.trim()
+							.matches(
+									"(?i)((ix|iv|v?i{0,3})|(page( |-)([0-9])*))")) {
 						continue;
 					}
 					abstractContent.add(pageBlock.get(i));
 				}
-				
+
 				titleOffset++;
 			}
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
-		for(FontGroup fg:abstractContent){
+		for (FontGroup fg : abstractContent) {
 			sb.append(fg.getText().trim() + "\n ");
 		}
-		
-		System.out.println(ms.getTitle());
+
+		//Removing page numbers
 		returnVal = removePageNumbers(sb.toString());
-		
 		return returnVal;
 	}
 
@@ -365,7 +457,8 @@ public class UOAThesisExtractor implements ReportExtractor {
 			if (results.size() == 0) {
 				String[] split = searchText.split("(\r?\n){2,}");
 				for (String x : split) {
-					searchText = x.replaceAll("\r?\n", " ").replaceAll("  ", " ");
+					searchText = x.replaceAll("\r?\n", " ").replaceAll("  ",
+							" ");
 					m = p.matcher(searchText);
 
 					while (m.find()) {
@@ -375,7 +468,8 @@ public class UOAThesisExtractor implements ReportExtractor {
 			}
 		}
 
-		Map<String, Long> map = results.stream().collect(Collectors.groupingBy(w -> w, Collectors.counting()));
+		Map<String, Long> map = results.stream().collect(
+				Collectors.groupingBy(w -> w, Collectors.counting()));
 		String result = "";
 		long count = 0;
 
@@ -398,9 +492,10 @@ public class UOAThesisExtractor implements ReportExtractor {
 	 */
 
 	private String reduceOutput(String value) {
-		
+
 		String[] firstBlock = value.split("(\r?\n){2,}");
-		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ").trim();
+		String returnVal = firstBlock[0].replaceAll("\r?\n", " ")
+				.replaceAll("  ", " ").trim();
 
 		return returnVal;
 	}
@@ -425,7 +520,8 @@ public class UOAThesisExtractor implements ReportExtractor {
 		String[] split = input.split("(\r?\n)");
 		StringBuilder sb = new StringBuilder();
 		for (String x : split) {
-			if (x.trim().matches("(?i)(ix|iv|v?i{0,3})") || x.trim().matches("(?i)page ([0-9])*")) {
+			if (x.trim().matches("(?i)(ix|iv|v?i{0,3})")
+					|| x.trim().matches("(?i)page ([0-9])*")) {
 				continue;
 			}
 			sb.append(x + "\r\n");
