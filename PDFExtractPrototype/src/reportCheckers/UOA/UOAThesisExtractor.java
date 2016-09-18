@@ -39,8 +39,8 @@ public class UOAThesisExtractor implements ReportExtractor {
 		ms.setAuthors(findAuthor());
 		// ms.setAbstractx(findAbstract());
 		// ms.setSupervisors(findSupervisors());
-		// ms.setDegree(findDegree());
-		// ms.setDegreeDiscp(findDiscipline());
+		 ms.setDegree(findDegree());
+		 ms.setDegreeDiscp(findDiscipline());
 		// ms.setAltTitle(findSubtitle());
 		return ms;
 	}
@@ -91,7 +91,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 		ArrayList<FontGroup> finalGroups = new ArrayList<FontGroup>();
 		// reducing list to only search before supervisors are specified
 		for (FontGroup fg : coverPage) {
-			String text = fg.getText().replaceAll("[^a-zA-Z0-9 -]","");
+			String text = fg.getText().replaceAll("[^a-zA-Z0-9 -]", "");
 			if (text.matches("(.*((?i)supervisor).*)")) {
 				break;
 			}
@@ -138,8 +138,37 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 	@Override
 	public String findDegree() {
-		// TODO Auto-generated method stub
-		return null;
+		String returnVal = null;
+		ArrayList<FontGroup> searchArea = new ArrayList<FontGroup>();
+		
+		// Find appropriate blocks to search through
+		if (titlePage != -1 && titleIndex != -1) {
+			int index = titleIndex;
+			while (fontGroupings.size() > index && fontGroupings.get(index).getPageNum() == titlePage) {
+				searchArea.add(fontGroupings.get(index));
+				index++;
+			}
+		}
+		else{
+			searchArea = fontGroupings;
+		}
+
+		returnVal = findCommon(searchArea, Pattern.compile("((?i)(master|doctor)(s)? (of|in))(( [A-Z][a-zA-z]*)+)"));
+
+		if (returnVal.equals("")) {
+			degreeIndex = -1;
+			return null;
+		}
+
+		for (FontGroup f : searchArea) {
+			String text = f.getText().replaceAll("\r?\n", " ").replaceAll("  ", " ");
+			if (text.contains(returnVal)) {
+				degreeIndex = fontGroupings.indexOf(f);
+				break;
+			}
+		}
+		
+		return reduceOutput(returnVal);
 	}
 
 	@Override
