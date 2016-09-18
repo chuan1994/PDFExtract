@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import reportCheckers.ReportChecker;
+import reportCheckers.ReportExtractor;
 import main.MetadataStorer;
 import helperClasses.FontGroup;
 
@@ -17,7 +17,7 @@ import helperClasses.FontGroup;
  * @author cwu323
  *
  */
-public class UOAReportChecker implements ReportChecker {
+public class UOAReportChecker implements ReportExtractor {
 
 	MetadataStorer ms;
 

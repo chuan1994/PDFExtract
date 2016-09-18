@@ -12,7 +12,9 @@ import javax.swing.SwingWorker;
 
 import org.apache.pdfbox.pdmodel.*;
 
+import reportCheckers.ReportExtractor;
 import reportCheckers.UOA.UOAReportChecker;
+import reportCheckers.UOA.UOAThesisExtractor;
 import helperClasses.FontGroup;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
@@ -71,14 +73,13 @@ public class MyPDFParser extends SwingWorker<Void, Void> {
 			}
 
 			String text = sb.toString();
-
 			//Parsing information and extracting using reportCheckers
 			ArrayList<FontGroup> textGroups2 = splitOutcome(text);
-			UOAReportChecker checker2 = new UOAReportChecker(textGroups2);
+			ReportExtractor checker = new UOAThesisExtractor(textGroups2);
 			addSurfaceMeta();
-			meta = checker2.getAllMeta(meta);
+			meta = checker.getAllMeta(meta);
 			
-			printToConsole();
+//			printToConsole();
 			writeToFile();
 
 		} catch (IOException e) {
@@ -153,7 +154,7 @@ public class MyPDFParser extends SwingWorker<Void, Void> {
 				while (f.exists()) {
 					i++;
 					outputPath = outputFolder.getCanonicalPath() + File.separator + pdf.getName().split("\\.")[0] + "("
-							+ i + ")" + ".txt";
+							+ i + ")" + ".json";
 
 					f = new File(outputPath);
 				}
