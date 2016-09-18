@@ -57,6 +57,7 @@ public class Main {
 			}
 			for(MyPDFParser mpp:mppRemoveList){
 				mppList.remove(mpp);
+				mpp.close();
 			}
 		}
 	}

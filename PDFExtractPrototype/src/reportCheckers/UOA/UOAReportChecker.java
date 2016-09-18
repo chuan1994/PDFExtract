@@ -11,6 +11,12 @@ import reportCheckers.ReportChecker;
 import main.MetadataStorer;
 import helperClasses.FontGroup;
 
+/**
+ * This class is the report checker for Thesis submissions at UOA, disciplined in Computer science
+ * it may not work for documents not in this category.
+ * @author cwu323
+ *
+ */
 public class UOAReportChecker implements ReportChecker {
 
 	MetadataStorer ms;
@@ -68,9 +74,12 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String[] findAuthor() {
+		//Matches the following characteristics
+		//Regex matching, comes after title, is on title page
 		String[] author = { null };
-
-		for (int i = this.titleIndex; i < this.fontGroupings.size(); i++) {
+		
+		
+		for (int i = this.titleIndex; i < this.fontGroupings.size() && fontGroupings.get(i).getPageNum() == titlePage; i++) {
 			String text = this.fontGroupings.get(i).getText();
 			String[] split = text.trim().split("(\r?\n)");
 			for (String x : split) {
@@ -103,6 +112,8 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findSubtitle() {
+		//Matches the following characteristics
+		//follows directly after the title, comes before any other named entity
 		int nextIndex = this.titleIndex + 1;
 		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
 		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
@@ -116,6 +127,8 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findAbstract() {
+		//Matches the following characteristics
+		//found first 10 pages of document, follows 'abstract' header, 
 		FontGroup abstBlock = null;
 		String abst;
 		String abstContent = "";
@@ -123,7 +136,7 @@ public class UOAReportChecker implements ReportChecker {
 		boolean found = false;
 
 		while (!found) {
-			if (titlePage + titleOffSet > 5) {
+			if (titlePage + titleOffSet > 10) {
 				found = true;
 				break;
 			}
@@ -245,6 +258,8 @@ public class UOAReportChecker implements ReportChecker {
 
 	@Override
 	public String findDiscipline() {
+		//uses degree to find discipline
+		//searches text right after degree to see if specified
 		if (degreeIndex == -1) {
 			return null;
 		}
@@ -281,8 +296,7 @@ public class UOAReportChecker implements ReportChecker {
 		return reduceOutput(result);
 	}
 	// =========================================================================
-	// Unimplemented
-
+	// Not required for UOA Theses
 	@Override
 	public Date findPubDate() {
 		// TODO Auto-generated method stub
@@ -303,9 +317,15 @@ public class UOAReportChecker implements ReportChecker {
 
 	// =========================================================================
 	// Private helper methods
+	
+	/**
+	 * Find the fontgroup with teh largest font given a list of fontgroups
+	 * @param group
+	 * @return
+	 */
 	private FontGroup maxFontSizeBlock(ArrayList<FontGroup> group) {
 		float maxFontSize = 0;
-		FontGroup returnVal = group.get(0);
+		FontGroup returnVal = new FontGroup("",0,"", 0);
 
 		for (FontGroup fg : group) {
 			if (fg.getFontSize() > maxFontSize) {
@@ -316,6 +336,13 @@ public class UOAReportChecker implements ReportChecker {
 		return returnVal;
 	}
 
+	/**
+	 * Method to find the text which matches the pattern p from a list of font groups
+	 * It returns the most commonly found
+	 * @param blocks
+	 * @param p
+	 * @return
+	 */
 	private String findCommon(ArrayList<FontGroup> blocks, Pattern p) {
 		ArrayList<String> results = new ArrayList<String>();
 		for (FontGroup f : blocks) {
@@ -353,6 +380,11 @@ public class UOAReportChecker implements ReportChecker {
 		return result;
 	}
 
+	/**
+	 * Method to get all the fontgroups in the specified page
+	 * @param pageNumber
+	 * @return
+	 */
 	private ArrayList<FontGroup> getPageBlocks(int pageNumber) {
 		ArrayList<FontGroup> group = new ArrayList<FontGroup>();
 		for (FontGroup block : fontGroupings) {
@@ -363,6 +395,12 @@ public class UOAReportChecker implements ReportChecker {
 		return group;
 	}
 
+	/**
+	 * Method to form simple paragraphs
+	 * @param value
+	 * @return
+	 */
+	
 	private String reduceOutput(String value) {
 		String[] firstBlock = value.split("(\r?\n){2,}");
 		String returnVal = firstBlock[0].replaceAll("\r?\n", " ").replaceAll("  ", " ").trim();
@@ -370,16 +408,26 @@ public class UOAReportChecker implements ReportChecker {
 		return returnVal;
 	}
 
+	/**
+	 * method to remove all excess spaces
+	 * @param value
+	 * @return
+	 */
 	private String singleLine(String value) {
 		return value.replaceAll("\\s+", " ").trim();
 	}
 	
 
+	/**
+	 * method to remove page numbers 
+	 * @param input
+	 * @return
+	 */
 	private String removeRomanNumerals(String input){
 		String[] split = input.split("(\r?\n)");
 		StringBuilder sb = new StringBuilder();
 		for(String x : split){
-			if(x.trim().matches("(?i)(ix|iv|v?i{0,3})")){
+			if(x.trim().matches("(?i)(ix|iv|v?i{0,3})") || x.trim().matches("(?i)page ([0-9])*")){
 				continue;
 			}
 			sb.append(x + "\r\n");

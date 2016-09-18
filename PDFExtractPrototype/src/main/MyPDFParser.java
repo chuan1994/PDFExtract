@@ -17,6 +17,12 @@ import helperClasses.FontGroup;
 import helperClasses.MyTextStripper;
 import helperClasses.PageDimensionCalc;
 
+/**
+ * this class is responsible for obtaining the metadata information
+ * It extends swingworker to run the extraction on its own thread
+ * @author cwu323
+ *
+ */
 public class MyPDFParser extends SwingWorker<Void, Void> {
 	private String path;
 	private File pdf;
