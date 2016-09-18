@@ -42,7 +42,7 @@ public class UOAThesisExtractor implements ReportExtractor {
 		// ms.setAbstractx(findAbstract());
 		// ms.setSupervisors(findSupervisors());
 		 
-		// ms.setAltTitle(findSubtitle());
+		 ms.setAltTitle(findSubtitle());
 		return ms;
 	}
 
@@ -74,8 +74,19 @@ public class UOAThesisExtractor implements ReportExtractor {
 
 	@Override
 	public String findSubtitle() {
-		// TODO Auto-generated method stub
-		return null;
+		//Obtain string right after title. This is subtitle, provided it is not the author and degree
+		String returnVal = null;
+		int nextIndex = this.titleIndex + 1;
+		int fgPageNum = this.fontGroupings.get(nextIndex).getPageNum();
+		String subtitleText = this.fontGroupings.get(nextIndex).getText().replaceAll("\r?\n", " ");
+		if (nextIndex < this.authorIndex && nextIndex < this.degreeIndex && fgPageNum == this.titlePage && subtitleText.split(" ").length > 1) {
+			return reduceOutput(subtitleText);
+		}
+		
+		
+		
+		
+		return returnVal;
 	}
 
 	@Override
