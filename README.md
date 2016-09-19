@@ -18,6 +18,26 @@ where you replace
 It will store the output JSON file with the name of the corresponding pdf.
 
 ##For Developers
-
+The application has been built with Java. The package strucutre and its classes are explained below.
 
 ###Package - main
+Contains the classes which are responsible for the extraction of the metadata
+
+**Main class:**
+- Entry point to program
+- Does type checking
+- Parses input parameters 
+- Provides help if wrong parameters are provided
+
+**MetadataStorer class:**
+- POJO to store all the extracted information
+
+**MyPDFParser class:**
+- Extends swingworker to run on own thread
+- Responsible for extracting the metadata information
+- Retreives output and prints it into the corresponding file
+
+**OutputPrinter class:**
+- Repsonsible for printing metadataStorer into specified outputstream
+- Prints using JSON or just displays the fields in metadata
+
