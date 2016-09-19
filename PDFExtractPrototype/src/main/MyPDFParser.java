@@ -112,7 +112,6 @@ public class MyPDFParser extends SwingWorker<Void, Void> {
 			pdDoc = pdDoc.load(pdf);
 
 			myStripper = new MyTextStripper();
-
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -162,7 +161,7 @@ public class MyPDFParser extends SwingWorker<Void, Void> {
 			}
 
 			FileOutputStream fos = new FileOutputStream(f);
-			PrintStream ps = new PrintStream(fos);
+			PrintStream ps = new PrintStream(fos, true, "UTF-8");
 			OP.JSONPrinter(ps, meta);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
