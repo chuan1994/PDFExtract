@@ -4,6 +4,7 @@
 You will require the following conditions to run the program:
 - JVM installed on the machine
 - CLI tool to execute the jar
+- There are dependencies for this project, which have been provided in the top level folder of this repository (Standalone tool has these packaged inside)
 
 ##For End Users
 The built standalone jar file is able to extract bibliography items from a specified PDF document or a specified list. You can perform this task by typing the following command into a CLI program:
